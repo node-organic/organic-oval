@@ -1,12 +1,15 @@
-var oval = module.exports = {
+module.exports = {
   updateElement: require('./lib/update-element'),
   createElement: require('./lib/create-element'),
   registeredTags: [],
-  plasma: null,
+  init: function (plasma) {
+    this.plasma = require('./lib/organic-plasma-dom')(plasma)
+    this.BaseTag = require('./lib/base-tag')(this)
+  },
   getRegisteredTag: function (name) {
-    for (var i = 0; i < oval.registeredTags.length; i++) {
-      if (oval.registeredTags[i].tagName === name.toLowerCase()) {
-        return oval.registeredTags[i].Tag
+    for (var i = 0; i < this.registeredTags.length; i++) {
+      if (this.registeredTags[i].tagName === name.toLowerCase()) {
+        return this.registeredTags[i].Tag
       }
     }
   },
@@ -15,8 +18,8 @@ var oval = module.exports = {
     var elements
     if (selector === '*') {
       elements = []
-      for (var i = 0; i < oval.registeredTags.length; i++) {
-        var els = root.querySelectorAll(oval.registeredTags[i].tagName)
+      for (var i = 0; i < this.registeredTags.length; i++) {
+        var els = root.querySelectorAll(this.registeredTags[i].tagName)
         if (els.length) {
           for (var k = 0; k < els.length; k++) {
             elements.push(els[k])
@@ -34,7 +37,7 @@ var oval = module.exports = {
         continue
       }
       var name = elements[i].tagName
-      var Tag = oval.getRegisteredTag(name)
+      var Tag = this.getRegisteredTag(name)
       var instance = new Tag(name, elements[i])
       instance.update()
       tags.push(instance)
@@ -43,22 +46,20 @@ var oval = module.exports = {
   },
   appendAt: function (el, tagName) {
     if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
-    var Tag = oval.getRegisteredTag(tagName)
+    var Tag = this.getRegisteredTag(tagName)
     var instance = new Tag(tagName, document.createElement(tagName))
     instance.update()
     el.appendChild(instance.root)
     return instance
   },
   register: function (tagName, TagClass) {
-    if (oval.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
+    if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
     if (document.registerElement) {
       document.registerElement(tagName.toUpperCase())
     }
-    oval.registeredTags.push({
+    this.registeredTags.push({
       tagName: tagName,
       Tag: TagClass
     })
   }
 }
-
-oval.BaseTag = require('./lib/base-tag')

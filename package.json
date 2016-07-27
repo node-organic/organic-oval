@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/camplight/organic-oval.git"
   },
-  "author": "Dimitar Mirchev & Boris Filipov",
+  "author": "Camplight",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/camplight/organic-oval/issues"
