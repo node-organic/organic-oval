@@ -1,7 +1,7 @@
 {
   "name": "organic-oval",
   "version": "1.0.0",
-  "description": "organic frontend dom tags",
+  "description": "organic frontend components as custom html tags",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

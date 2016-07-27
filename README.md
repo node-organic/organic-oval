@@ -1,3 +1,3 @@
 # organic-oval
 
-organic frontend dom tags
+organic frontend components as custom html tags

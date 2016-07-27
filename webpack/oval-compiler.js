@@ -47,7 +47,7 @@ module.exports.compile = function (content) {
         return ${htmlContent}
       }
     }
-    oval.register('${tagName}', Tag)
+    oval.registerTag('${tagName}', Tag)
     export default Tag
   `
   return result

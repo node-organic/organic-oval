@@ -52,7 +52,7 @@ module.exports = {
     el.appendChild(instance.root)
     return instance
   },
-  register: function (tagName, TagClass) {
+  registerTag: function (tagName, TagClass) {
     if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
     if (document.registerElement) {
       document.registerElement(tagName.toUpperCase())
