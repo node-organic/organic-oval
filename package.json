@@ -1,0 +1,22 @@
+{
+  "name": "organic-oval",
+  "version": "1.0.0",
+  "description": "organic frontend dom tags",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camplight/organic-oval.git"
+  },
+  "author": "Dimitar Mirchev & Boris Filipov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/camplight/organic-oval/issues"
+  },
+  "homepage": "https://github.com/camplight/organic-oval#readme",
+  "dependencies": {
+    "morphdom": "^2.0.1"
+  }
+}
