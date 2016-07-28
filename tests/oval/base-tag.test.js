@@ -53,7 +53,7 @@ describe('base-tag', function () {
   before(function () {
     window.document.body.innerHTML = ''
     var plasma = {}
-    oval = require('../index')
+    oval = require('../../index')
     oval.registeredTags = []
     oval.init(plasma)
     oval.registerTag('custom-tag', Tag)

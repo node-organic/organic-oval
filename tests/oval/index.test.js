@@ -10,7 +10,7 @@ describe('oval', function () {
   before(function () {
     window.document.body.innerHTML = ''
     var plasma = {}
-    oval = require('../index')
+    oval = require('../../index')
     oval.registeredTags = []
     oval.init(plasma)
     expect(oval.plasma.on).to.exist
