@@ -2,11 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [next-version] - release-date
+## [major.minor.patch] - YYYY-MM-DD
 
 ### Fixed
 
 - `BaseTag` organic-plasma-dom events
+- `BaseTag.shouldRender`
+
+### Added
+
+- basic oval tests
+- `oval.mountAt`
+
+### Improved
+
+- `oval.unmount`
 
 
 ## [1.0.0] - 2016-07-27
