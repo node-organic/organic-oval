@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - basic oval tests
 - `oval.mountAt`
 - code coverage
+- examples
+- documentation
 
 ### Improved
 
