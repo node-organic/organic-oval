@@ -147,8 +147,8 @@ The tag name is declared in the first opening and last closing tags in the `.tag
 ...
 <script>
   tag.links = {
-    home: '/home',
-    about: '/about'
+    home: '#home',
+    about: '#about'
   }
 </script>
 ...
@@ -156,7 +156,7 @@ The tag name is declared in the first opening and last closing tags in the `.tag
 
 #### **template**
 
-The template part contains all the DOM elements. It describes the layout of the tag. Organic-oval uses [JSX]() to describe its layout. You have the `tag` variable available in the tamplate, too.
+The template part contains all the DOM elements. It describes the layout of the tag. Organic-oval uses [JSX]() to describe its layout. You have the `tag` variable available in the template, too.
 
 ```html
 ...
@@ -169,14 +169,14 @@ The template part contains all the DOM elements. It describes the layout of the 
 
 #### Basic Tag Example
 
-here is how the whole `navigation` tag looks like
+here is how the whole `navigation.tag` looks like
 
 ```html
 <navigation>
   <script>
     tag.links = {
-      home: '/home',
-      about: '/about'
+      home: '#home',
+      about: '#about'
     }
   </script>
   <ul class="navigation">
@@ -187,3 +187,37 @@ here is how the whole `navigation` tag looks like
 ```
 
 ### Nested Tags
+
+Every custom tag in `organic-oval` can include other tags. Taking the `Basic Tag` example, lets move the navigation item in its own component, so whenever we need to update the navigation item layout (for example), we will have to modify the navigation item tag only.
+
+First lets build the new `navigation-item` component.
+
+```html
+<navigation-item>
+  <li><a href={tag.link.href}>{tag.link.title}</a></li>
+</navigation-item>
+```
+
+The way we use a custom component in another component is by simply requiring it in the parent component's script. This is how the new navigation component will look like.
+
+```html
+<navigation>
+  <script>
+    require('./navigation-item')
+    tag.links = {
+      home: {
+        href: '#home',
+        title: 'Home'
+      },
+      about: {
+        href: '#about',
+        title: 'About'
+      }
+    }
+  </script>
+  <ul class="navigation">
+    <navigation-item link={tag.links.home} />
+    <navigation-item link={tag.links.about} />
+  </ul>
+</navigation>
+```
