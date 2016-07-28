@@ -4,7 +4,9 @@
   "description": "organic frontend components as custom html tags",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --compilers js:babel-register --require ./tests/setup.js tests/**/*.test.js",
+    "test-cov": "babel-node ./node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --require ./tests/setup.js --recursive 'tests/**/*.test.js'",
+    "release-patch": "npm run test && npm version patch && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,15 @@
   "homepage": "https://github.com/camplight/organic-oval#readme",
   "dependencies": {
     "morphdom": "^2.0.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.11.4",
+    "babel-polyfill": "^6.9.1",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-register": "^6.11.6",
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.4",
+    "jsdom": "^9.4.1",
+    "mocha": "^2.5.3"
   }
 }

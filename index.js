@@ -15,9 +15,8 @@ module.exports = {
   },
   mountAll: function (selector, root) {
     if (!selector || !root) throw new Error(arguments + ' supplied should have selector and root')
-    var elements
+    var elements = []
     if (selector === '*') {
-      elements = []
       for (var i = 0; i < this.registeredTags.length; i++) {
         var els = root.querySelectorAll(this.registeredTags[i].tagName)
         if (els.length) {
@@ -43,6 +42,17 @@ module.exports = {
       tags.push(instance)
     }
     return tags
+  },
+  mountAt: function (el, tagName) {
+    if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
+    if (el.oval_tag) {
+      el.oval_tag.update()
+      return el.oval_tag
+    }
+    var Tag = this.getRegisteredTag(tagName)
+    var instance = new Tag(tagName, el)
+    instance.update()
+    return instance
   },
   appendAt: function (el, tagName) {
     if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')

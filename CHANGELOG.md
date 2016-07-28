@@ -2,11 +2,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [next-version] - release-date
+## [major.minor.patch] - YYYY-MM-DD
 
 ### Fixed
 
 - `BaseTag` organic-plasma-dom events
+- `BaseTag.shouldRender`
+
+### Added
+
+- basic oval tests
+- `oval.mountAt`
+- code coverage
+
+### Improved
+
+- `oval.unmount`
+- oval compiler related code located under /lib/compilers
 - `registerTag` remove usage of `document.registerTag`
 
 

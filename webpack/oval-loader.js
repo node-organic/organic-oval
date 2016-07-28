@@ -1,10 +1,10 @@
-var oval = require('./oval-compiler')
+var TagCompiler = require('../lib/compilers/tag-file')
 
 module.exports = function (source) {
   var content = source
   if (this.cacheable) this.cacheable()
   try {
-    return oval.compile(content)
+    return TagCompiler.compile(content)
   } catch (e) {
     if (e instanceof Error) {
       throw e
