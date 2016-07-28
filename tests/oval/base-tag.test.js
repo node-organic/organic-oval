@@ -18,10 +18,10 @@ describe('base-tag', function () {
 
   var TagWithEvents = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.on('mount', () => this.mountCalled = true)
-    this.on('update', () => this.updateCalled = true)
-    this.on('updated', () => this.updatedCalled = true)
-    this.on('mounted', () => this.mountedCalled = true)
+    this.on('mount', () => { this.mountCalled = true })
+    this.on('update', () => { this.updateCalled = true })
+    this.on('updated', () => { this.updatedCalled = true })
+    this.on('mounted', () => { this.mountedCalled = true })
   }
   TagWithEvents.prototype.render = function (createElement) {
     return createElement(this.tagName, {})
@@ -41,7 +41,7 @@ describe('base-tag', function () {
     oval.BaseTag(this, tagName, root)
     this.rendered = false
     this.renderValue = Math.random().toString()
-    this.on('updated', () => this.rendered = true)
+    this.on('updated', () => { this.rendered = true })
   }
   TagShouldRender.prototype.shouldRender = function () {
     return !this.rendered
@@ -98,7 +98,7 @@ describe('base-tag', function () {
   it('injectDirectives', function () {
     var el = document.createElement('custom-tag-with-directives')
     document.body.appendChild(el)
-    var tag = oval.mountAt(el, 'custom-tag-with-directives')
+    oval.mountAt(el, 'custom-tag-with-directives')
 
     expect(el.attributes.class.value).to.eq('test')
   })

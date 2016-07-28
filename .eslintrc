@@ -1,0 +1,17 @@
+{
+  "extends": "standard",
+  "rules": {
+    "comma-dangle": [0]
+  },
+  "globals": {
+    "describe": true,
+    "before": true,
+    "after": true,
+    "it": true,
+    "test": true,
+    "expect": true,
+    "xit": true,
+    "xdescribe": true,
+    "CustomEvent": true
+  }
+}
