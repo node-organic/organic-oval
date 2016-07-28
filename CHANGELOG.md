@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
+- `registerTag` remove usage of `document.registerTag`
 
 
 ## [1.0.0] - 2016-07-27
