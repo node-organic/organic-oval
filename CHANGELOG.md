@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - `BaseTag` organic-plasma-dom events
+- `registerTag` remove usage of `document.registerTag`
 
 
 ## [1.0.0] - 2016-07-27
