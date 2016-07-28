@@ -4,11 +4,17 @@ organic frontend components as custom html tags
 
 ## API
 
-### `oval.init(plasma)`
+### `oval.init([plasma])`
+
+initializes `organic-oval` with plasma
 
 ### `oval.getRegisteredTag(name)`
 
+gets the tag class from registered tags by name
+
 ### `oval.mountAll(selector, root)`
+
+
 
 ### `oval.appendAt(el, tagName)`
 
@@ -18,7 +24,7 @@ organic frontend components as custom html tags
 
 ## Setup
 
-Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that fits you.
+Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you.
 
 ### Vanilla
 
@@ -26,7 +32,7 @@ Oval can be used in many ways. There are different setups for each way. Read the
 
 Vanilla setup consists of the basic things, that `organic-oval` needs in order to run. Here is an example `webpack` config:
 
-```
+```js
 module.exports = {
   'module': {
     'loaders': [
@@ -49,7 +55,7 @@ module.exports = {
 
 If you want to use `JSX` in you components here is an example `webpack` config for `organic-oval` + `JSX`:
 
-```
+```js
 module.exports = {
   'module': {
     'loaders': [
@@ -73,7 +79,7 @@ module.exports = {
 We suggest using oval with `.tag` files. We have implemented a loader, that will take your tag definitions and will make valid oval components.
 Here is the `webpack` configuration you will need in order to get this setup running.
 
-```
+```js
 var webpack = require('webpack')
 
 module.exports = {
@@ -116,5 +122,68 @@ module.exports = {
 ## Oval Tags Usage
 
 ### Basic Tag
+
+Every tag consists of 3 parts, which are all declared i the `.tag` file.
+
+#### **tag name**
+
+The **tag name** is used for the tag registration and usage later in the application. The tag name must be unique.
+
+For example if we have the site navigation moved in its own tag, we can name the tag `navigation`.
+
+The tag name is declared in the first opening and last closing tags in the `.tag` file
+
+```html
+<navigation>
+  ...
+</navigation>
+```
+
+#### **script (optional)**
+
+  The script contains the tag's logic. It must be wrapped in `<script>` tags. The tag object is accessed via the `tag` variable.
+
+```html
+...
+<script>
+  tag.links = {
+    home: '/home',
+    about: '/about'
+  }
+</script>
+...
+```
+
+#### **template**
+
+The template part contains all the DOM elements. It describes the layout of the tag. Organic-oval uses [JSX]() to describe its layout. You have the `tag` variable available in the tamplate, too.
+
+```html
+...
+<ul class="navigation">
+  <li><a href={tag.links.home}>Home</a></li>
+  <li><a href={tag.links.about}>About</a></li>
+</ul>
+...
+```
+
+#### Basic Tag Example
+
+here is how the whole `navigation` tag looks like
+
+```html
+<navigation>
+  <script>
+    tag.links = {
+      home: '/home',
+      about: '/about'
+    }
+  </script>
+  <ul class="navigation">
+    <li><a href={tag.links.home}>Home</a></li>
+    <li><a href={tag.links.about}>About</a></li>
+  </ul>
+</navigation>
+```
 
 ### Nested Tags
