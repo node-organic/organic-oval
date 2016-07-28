@@ -1,10 +1,10 @@
-var oval = require('./oval-control-statements')
+var TagCompiler = require('../lib/compilers/tag-control-statements')
 
 module.exports = function (source) {
   var content = source
   if (this.cacheable) this.cacheable()
   try {
-    return oval.compile(content)
+    return TagCompiler.compile(content)
   } catch (e) {
     if (e instanceof Error) {
       throw e

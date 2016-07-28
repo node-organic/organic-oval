@@ -1,5 +1,5 @@
 describe('oval-control-statements', function () {
-  var compiler = require('../../webpack/oval-control-statements')
+  var compiler = require('../../lib/compilers/tag-control-statements')
   it('compiles', function () {
     var content = `<tag-name>
     <virtual if={test}>

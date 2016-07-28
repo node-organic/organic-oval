@@ -13,10 +13,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - basic oval tests
 - `oval.mountAt`
+- code coverage
 
 ### Improved
 
 - `oval.unmount`
+- oval compiler related code located under /lib/compilers
 
 
 ## [1.0.0] - 2016-07-27

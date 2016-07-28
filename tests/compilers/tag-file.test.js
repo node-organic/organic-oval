@@ -1,5 +1,5 @@
 describe('oval-compiler', function () {
-  var compiler = require('../../webpack/oval-compiler')
+  var compiler = require('../../lib/compilers/tag-file')
   it('compiles', function () {
     var content = `<tag-name>
     <script>
