@@ -54,9 +54,6 @@ module.exports = {
   },
   registerTag: function (tagName, TagClass) {
     if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
-    if (document.registerElement) {
-      document.registerElement(tagName.toUpperCase())
-    }
     this.registeredTags.push({
       tagName: tagName,
       Tag: TagClass
