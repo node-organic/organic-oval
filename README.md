@@ -188,36 +188,72 @@ here is how the whole `navigation.tag` looks like
 
 ### Nested Tags
 
-Every custom tag in `organic-oval` can include other tags. Taking the `Basic Tag` example, lets move the navigation item in its own component, so whenever we need to update the navigation item layout (for example), we will have to modify the navigation item tag only.
+<!-- Every custom tag in `organic-oval` can include other tags. Taking the `Basic Tag` example, lets move the navigation item in its own component, so whenever we need to update the navigation item layout (for example), we will have to modify the navigation item tag only.
 
-First lets build the new `navigation-item` component.
+First lets build the new `navigation-item` component. -->
 
-```html
-<navigation-item>
-  <li><a href={tag.link.href}>{tag.link.title}</a></li>
-</navigation-item>
-```
+#### Requiring a nested tag
 
-The way we use a custom component in another component is by simply requiring it in the parent component's script. This is how the new navigation component will look like.
+In order to use a tag within a tag, you must require it in the `<script></script>`. There is no need to assign it to a variable. What the require does is to register the nested tag to `oval`.
 
 ```html
 <navigation>
   <script>
     require('./navigation-item')
-    tag.links = {
-      home: {
-        href: '#home',
-        title: 'Home'
-      },
-      about: {
-        href: '#about',
-        title: 'About'
-      }
-    }
+    ...
   </script>
-  <ul class="navigation">
-    <navigation-item link={tag.links.home} />
-    <navigation-item link={tag.links.about} />
-  </ul>
+  ...
 </navigation>
 ```
+
+#### Using a nested tag
+
+After requiring it, the nested tag can be used as any other tag in the parent's template.
+
+```html
+<navigation>
+  <script>
+    require('./navigation-item')
+    ...
+  </script>
+  ...
+  <navigation-item ...>...</navigation-item>
+  ...
+</navigation>
+```
+
+#### Passing props to a nested tag
+
+1. As an attribute
+
+  Setting an attribute to nested component is just like setting an attribute to a DOM element.
+
+  ```html
+  <navigation>
+    <script>
+      require('./navigation-item')
+      ...
+    </script>
+    ...
+    <navigation-item class="item" ...>...</navigation-item>
+    ...
+  </navigation>
+  ```
+
+2. By reference
+
+  Passing a property by reference makes it available as `tag.props.link` in the nested tag's logic.
+
+  ```html
+  <navigation>
+    <script>
+      require('./navigation-item')
+      ...
+    </script>
+    ...
+    <navigation-item ref-link={{title: 'Home', href: '#home'}}...>
+      ...
+    </navigation-item>
+    ...
+  </navigation>
+  ```
