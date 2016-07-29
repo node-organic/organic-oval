@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
 - `registerTag` remove usage of `document.registerTag`
+- `baseTag` all props from parent component go to `tag.props`
 
 
 ## [1.0.0] - 2016-07-27
