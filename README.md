@@ -279,6 +279,31 @@ After requiring it, the nested tag can be used as any other tag in the parent's 
 
 #### Using oval control statements
 
+##### setup
+
+Based on [Oval Tags Syntax](#oval-tags-syntax) one shold add `oval-control-statements-loader` to `preLoaders`
+
+```js
+var webpack = require('webpack')
+
+module.exports = {
+  ...
+  'module': {
+    'preLoaders': [
+      {
+        test: /\.tag$/,
+        exclude: /node_modules/,
+        loaders: [
+          'organic-oval/webpack/oval-loader',
+          'organic-oval/webpack/oval-control-statements-loader'
+        ]
+      }
+    ],
+    ...
+  }
+}
+```
+
 ##### IF conditional statements
 
 ```html
