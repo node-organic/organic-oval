@@ -16,8 +16,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - code coverage
 - examples
 - documentation
-- `tag.updateProps()`
-- `tag.updateRefs()`
+- `tag.updateProps()` which populates `tag.props` object
+- `tag.updateRefs()` which populates `tag.refs` object
+- `tag.updateAttributes()` which populates `tag.attributes` object
 
 ### Improved
 
