@@ -1,6 +1,8 @@
 # organic-oval
 
-organic frontend components as custom html tags
+organic front-end components as custom HTML tags
+
+**Check out [organic-oval-examples](https://github.com/camplight/organic-oval-examples) for example usages of `organic-oval`**
 
 ## API
 
@@ -44,103 +46,8 @@ class MyTag {
 
 ## Setup
 
-Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you.
+Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you. You can check out all example setups and test them out [**here**](https://github.com/camplight/organic-oval-examples/tree/master/setups)
 
-### VanillaJS
-
-[example](./examples/setup/vanilla)
-
-Vanilla setup consists of the basic things, that `organic-oval` needs in order to run. Here is an example `webpack` config:
-
-```js
-module.exports = {
-  'module': {
-    'loaders': [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          presets: ['es2015']
-        }
-      }
-    ]
-  }
-}
-```
-
-### JSX setup
-
-[example](./examples/setup/jsx)
-
-If you want to use `JSX` in you components here is an example `webpack` config for `organic-oval` + `JSX`:
-
-```js
-module.exports = {
-  'module': {
-    'loaders': [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          plugins: [
-            ['transform-react-jsx', { pragma: 'createElement' }]
-          ],
-          presets: ['es2015']
-        }
-      }
-    ]
-  }
-}
-```
-
-### Oval Tags Syntax
-
-[example](./examples/setup/tag)
-
-We suggest using oval with `.tag` files. We have implemented a loader, that will take your tag definitions and will make valid oval components.
-Here is the `webpack` configuration you will need in order to get this setup running.
-
-```js
-var webpack = require('webpack')
-
-module.exports = {
-  'resolve': {
-    'extensions': ['', '.tag', '.js']
-  },
-  'plugins': [
-    new webpack.ProvidePlugin({
-      'oval': 'organic-oval'
-    })
-  ],
-  'module': {
-    'preLoaders': [
-      {
-        test: /\.tag$/,
-        exclude: /node_modules/,
-        loaders: [
-          'organic-oval/webpack/oval-loader'
-        ]
-      }
-    ],
-    'loaders': [
-      {
-        test: /\.js|.tag$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          plugins: [
-            'transform-es2015-arrow-functions',
-            ['transform-react-jsx', { pragma: 'createElement' }]
-          ],
-          presets: ['es2015']
-        }
-      }
-    ]
-  }
-}
-```
 
 ## Oval Tags Usage
 
@@ -281,7 +188,7 @@ After requiring it, the nested tag can be used as any other tag in the parent's 
 
 ##### setup
 
-Based on [Oval Tags Syntax](#oval-tags-syntax) one shold add `oval-control-statements-loader` to `preLoaders`
+Based on Oval Tags Syntax [Setup](#setup) one should add `oval-control-statements-loader` to `preLoaders`
 
 ```js
 var webpack = require('webpack')
