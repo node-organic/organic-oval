@@ -23,7 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - oval compiler related code located under /lib/compilers
 - `registerTag` remove usage of `document.registerTag`
 - `baseTag` all props from parent component go to `tag.props`
-- add option to strip component's parent tag
+- add option to strip component's parent tag `tag.keepParentTag`, defaults to `true`
 
 
 ## [1.0.0] - 2016-07-27
