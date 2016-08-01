@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `tag.updateProps()` which populates `tag.props` object
 - `tag.updateRefs()` which populates `tag.refs` object
 - `tag.updateAttributes()` which populates `tag.attributes` object
+- moved examples in a seperate [repository](https://github.com/camplight/organic-oval-examples)
 
 ### Improved
 
