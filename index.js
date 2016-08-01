@@ -16,8 +16,9 @@ module.exports = {
   mountAll: function (selector, root) {
     if (!selector || !root) throw new Error(arguments + ' supplied should have selector and root')
     var elements = []
+    var i
     if (selector === '*') {
-      for (var i = 0; i < this.registeredTags.length; i++) {
+      for (i = 0; i < this.registeredTags.length; i++) {
         var els = root.querySelectorAll(this.registeredTags[i].tagName)
         if (els.length) {
           for (var k = 0; k < els.length; k++) {
@@ -29,7 +30,7 @@ module.exports = {
       elements = root.querySelectorAll(selector)
     }
     var tags = []
-    for (var i = 0; i < elements.length; i++) {
+    for (i = 0; i < elements.length; i++) {
       if (elements[i].oval_tag) {
         elements[i].oval_tag.update()
         tags.push(elements[i].oval_tag)

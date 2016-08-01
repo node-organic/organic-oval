@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - `BaseTag` organic-plasma-dom events
 - `BaseTag.shouldRender`
+- standardjs source code style
 
 ### Added
 
