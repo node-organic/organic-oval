@@ -7,12 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### API changes
 
 - `baseTag` all props from parent component go to `tag.props`
-
-### Fixed
-
-- `BaseTag` organic-plasma-dom events
-- `BaseTag.shouldRender`
-- standardjs source code style
+- `ref-` is now called `prop-`
 
 ### Added
 
@@ -21,15 +16,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - code coverage
 - examples
 - documentation
-- `tag.updateProps()`
+- `tag.updateProps()` which populates `tag.props` object
+- `tag.updateRefs()` which populates `tag.refs` object
+- `tag.updateAttributes()` which populates `tag.attributes` object
 
 ### Improved
 
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
-- `registerTag` remove usage of `document.registerTag`
-- `baseTag` all props from parent component go to `tag.props`
 - add option to strip component's parent tag `tag.keepParentTag`, defaults to `true`
+
+### Fixed
+
+- `registerTag` remove usage of `document.registerTag`
+- `BaseTag` organic-plasma-dom events
+- `BaseTag.shouldRender`
+- standardjs source code style
 
 
 ## [1.0.0] - 2016-07-27

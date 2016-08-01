@@ -11,7 +11,7 @@ describe('keep parent tag', function () {
     return createElement(this.tagName, {},
       createElement('div', {},
         createElement('child-tag', {
-          'ref-custom-value': {test: this.testValue}
+          'prop-custom-value': {test: this.testValue}
         })
       )
     )
