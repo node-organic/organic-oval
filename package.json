@@ -1,6 +1,6 @@
 {
   "name": "organic-oval",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "organic frontend components as custom html tags",
   "main": "index.js",
   "scripts": {
