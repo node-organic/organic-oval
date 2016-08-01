@@ -15,12 +15,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - basic oval tests
 - `oval.mountAt`
 - code coverage
+- `tag.updateProps()`
 
 ### Improved
 
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
 - `registerTag` remove usage of `document.registerTag`
+- `baseTag` all props from parent component go to `tag.props`
 
 
 ## [1.0.0] - 2016-07-27
