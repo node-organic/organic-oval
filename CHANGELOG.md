@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - examples
 - documentation
 - `tag.updateProps()`
+- `tag.updateRefs()`
 
 ### Improved
 
