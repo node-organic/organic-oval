@@ -46,9 +46,9 @@ class MyTag {
 
 Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you.
 
-### Vanilla
+### VanillaJS
 
-[example](https://github.com/camplight/organic-oval/tree/master/examples/setup/vanilla)
+[example](./examples/setup/vanilla)
 
 Vanilla setup consists of the basic things, that `organic-oval` needs in order to run. Here is an example `webpack` config:
 
@@ -71,7 +71,7 @@ module.exports = {
 
 ### JSX setup
 
-[example](https://github.com/camplight/organic-oval/tree/master/examples/setup/jsx)
+[example](./examples/setup/jsx)
 
 If you want to use `JSX` in you components here is an example `webpack` config for `organic-oval` + `JSX`:
 
@@ -84,6 +84,9 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         query: {
+          plugins: [
+            ['transform-react-jsx', { pragma: 'createElement' }]
+          ],
           presets: ['es2015']
         }
       }
@@ -94,7 +97,7 @@ module.exports = {
 
 ### Oval Tags Syntax
 
-[example](https://github.com/camplight/organic-oval/tree/master/examples/setup/tag)
+[example](./examples/setup/tag)
 
 We suggest using oval with `.tag` files. We have implemented a loader, that will take your tag definitions and will make valid oval components.
 Here is the `webpack` configuration you will need in order to get this setup running.
@@ -272,4 +275,69 @@ After requiring it, the nested tag can be used as any other tag in the parent's 
     </navigation-item>
     ...
   </navigation>
+  ```
+
+#### Using oval control statements
+
+##### IF conditional statements
+
+```html
+<navigation>
+  <script>
+    tag.show = false
+  </script>
+  <h1 if={tag.show}>
+    H1 Text
+  </h1>
+</navigation>
+```
+
+##### Loop control statements
+
+```html
+<navigation>
+  <script>
+    tag.items = [1, 2, 3]
+  </script>
+  <ul>
+    <each itemValue, itemIndex in {tag.items}>
+      <li>{itemIndex} - {itemValue}</li>
+    </each>
+  </ul>
+</navigation>
+```
+
+
+### control rendering of custom tag names
+
+By default `organic-oval` will render custom tag names, however there are cases where DOM doesn't likes this approach and can be altered via `tag.keepParentTag` option.
+
+See the following scenario as example:
+
+* `list-container.tag`
+
+  ```html
+  <list-container>
+    <script>
+      require('./my-list-item')
+    </script>
+    <ul>
+      <each item in {tag.props.items}>
+        <my-list-item ref-value={item} />
+      </each>
+    </ul>
+  </list-container>
+  ```
+
+* `my-list-item.tag`
+
+  ```html
+  <my-list-item>
+    <script>
+      this.keepParentTag = false
+    </script>
+    <li>
+      {tag.props.value}
+    </li>
+  </my-list-item>
   ```
