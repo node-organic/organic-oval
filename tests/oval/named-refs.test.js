@@ -27,12 +27,12 @@ describe('named refs', function () {
     var el = document.createElement('custom-tag')
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'custom-tag')
-    expect(tag.childRef).to.exist
+    expect(tag.refs.childRef).to.exist
     customTagInstance = tag
   })
 
   it('re-renders', function () {
     customTagInstance.update()
-    expect(customTagInstance.childRef).to.exist
+    expect(customTagInstance.refs.childRef).to.exist
   })
 })
