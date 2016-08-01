@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [major.minor.patch] - YYYY-MM-DD
+## [2.0.0] - 2016-08-01
+
+### API changes
+
+- `baseTag` all props from parent component go to `tag.props`
 
 ### Fixed
 
@@ -22,6 +26,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
 - `registerTag` remove usage of `document.registerTag`
+- add option to strip component's parent tag `tag.keepParentTag`, defaults to `true`
+- README
 
 
 ## [1.0.0] - 2016-07-27

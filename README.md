@@ -8,19 +8,39 @@ organic frontend components as custom html tags
 
 initializes `organic-oval` with plasma
 
+### `oval.registerTag(tagName, TagClass)`
+
+register tag with given implementation
+
 ### `oval.getRegisteredTag(name)`
 
 gets the tag class from registered tags by name
 
 ### `oval.mountAll(selector, root)`
 
+mount and update any tags under `selector` & `root`, special selector value (`"*"`) to mount any tags found from registered
 
+Returns all mounted tags as Array
 
 ### `oval.appendAt(el, tagName)`
 
-### `oval.registerTag(tagName, TagClass)`
+append, mount and update a new tag instance to given `el` by `tagName`. This method appends the tag to the given element.
+
+### `oval.mountAt(el, tagName)`
+
+mount and update a new tag instance to given `el` by `tagName`. This method overrides given element with the tag instance
 
 ### `oval.BaseTag(tag, tagName, root)`
+
+Tag constructor Function
+
+```
+class MyTag {
+  constructor (tagName, root) {
+    oval.BaseTag(this, tagName, root)
+  }
+}
+```
 
 ## Setup
 
@@ -187,10 +207,6 @@ here is how the whole `navigation.tag` looks like
 ```
 
 ### Nested Tags
-
-<!-- Every custom tag in `organic-oval` can include other tags. Taking the `Basic Tag` example, lets move the navigation item in its own component, so whenever we need to update the navigation item layout (for example), we will have to modify the navigation item tag only.
-
-First lets build the new `navigation-item` component. -->
 
 #### Requiring a nested tag
 
