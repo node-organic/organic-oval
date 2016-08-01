@@ -366,3 +366,5 @@ See the following scenario as example:
     </li>
   </my-list-item>
   ```
+
+##### Lifecycle events
