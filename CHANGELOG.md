@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [major.minor.patch] - YYYY-MM-DD
+## [2.0.0] - 2016-08-01
+
+### API changes
+
+- `baseTag` all props from parent component go to `tag.props`
 
 ### Fixed
 
@@ -15,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - basic oval tests
 - `oval.mountAt`
 - code coverage
+- examples
+- documentation
 - `tag.updateProps()`
 
 ### Improved
