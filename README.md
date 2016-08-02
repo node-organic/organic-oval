@@ -275,3 +275,13 @@ See the following scenario as example:
   ```
 
 ##### Lifecycle events
+
+## Know Issues
+
+1. element with `if` attribute with closing tag on the same line can not be parsed properly
+
+  Example:
+
+  ```html
+  <h1 if={condition}>Some Text</h1>
+  ```
