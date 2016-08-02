@@ -44,21 +44,21 @@ module.exports = {
     }
     return tags
   },
-  mountAt: function (el, tagName) {
+  mountAt: function (el, tagName, props) {
     if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
     if (el.oval_tag) {
       el.oval_tag.update()
       return el.oval_tag
     }
     var Tag = this.getRegisteredTag(tagName)
-    var instance = new Tag(tagName, el)
+    var instance = new Tag(tagName, el, props)
     instance.update()
     return instance
   },
-  appendAt: function (el, tagName) {
+  appendAt: function (el, tagName, props) {
     if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
     var Tag = this.getRegisteredTag(tagName)
-    var instance = new Tag(tagName, document.createElement(tagName))
+    var instance = new Tag(tagName, document.createElement(tagName), props)
     instance.update()
     el.appendChild(instance.root)
     return instance
