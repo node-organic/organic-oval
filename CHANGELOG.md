@@ -26,6 +26,33 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `oval.unmount`
 - oval compiler related code located under /lib/compilers
 - add option to strip component's parent tag `tag.keepParentTag`, defaults to `true`
+- `if` control statements parser
+  there was a problem when we have an element with some attributes and a `if` attribute. The rendered element on `condition === true` losed its other attributes:
+
+  ```
+  // before compilation
+  <h1 class="title" if={condition}>
+    Title Goes Here
+  </h1>
+
+  // after compilation (before)
+  {
+    condition
+    ? (
+      <h1>Title Goes Here</h1>
+    )
+    : null
+  }
+
+  // after compilation (now)
+  {
+    condition
+    ? (
+      <h1 class="title">Title Goes Here</h1>
+    )
+    : null
+  }
+  ```
 
 ### Fixed
 
