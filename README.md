@@ -276,6 +276,12 @@ See the following scenario as example:
 
 ##### Lifecycle events
 
+## Directives
+
+`organic-oval` gives you the functionality to extend the `createElement` function. You can write you directive and inject it in the components that will use it.
+
+Check out the [**directive example**](https://github.com/camplight/organic-oval-examples/tree/master/tags/directive) to see more.
+
 ## Know Issues
 
 1. element with `if` attribute with closing tag on the same line can not be parsed properly
