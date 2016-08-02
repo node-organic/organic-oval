@@ -10,8 +10,8 @@ describe('oval-compiler', function () {
 `
 
     var expectedCompiledCode = `class Tag {
-    constructor (tagName, root) {
-      oval.BaseTag(this, tagName, root)
+    constructor (tagName, root, props) {
+      oval.BaseTag(this, tagName, root, props)
       var tag = this
       var constructorCode = true
     }
