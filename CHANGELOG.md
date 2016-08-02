@@ -27,65 +27,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - oval compiler related code located under /lib/compilers
 - add option to strip component's parent tag `tag.keepParentTag`, defaults to `true`
 - `if` control statements parser
-  there was a problem when we have an element with some attributes and a `if` attribute. The rendered element on `condition === true` losed its other attributes:
-
-  ```
-  // before compilation
-  <h1 class="title" if={condition}>
-    Title Goes Here
-  </h1>
-
-  // after compilation (before)
-  {
-    condition
-    ? (
-      <h1>Title Goes Here</h1>
-    )
-    : null
-  }
-
-  // after compilation (now)
-  {
-    condition
-    ? (
-      <h1 class="title">Title Goes Here</h1>
-    )
-    : null
-  }
-  ```
+  - do not remove other element attributes
 - directives
-
-  - Updated `baseTag`'s `tag.injectDirectives`, so it passes `tag` to every directive:
-
-    ```
-    tag.injectDirectives = function (directives) {
-      tag.directives = directives
-      var argumentedDirectives = directives.map((d) => d(tag))
-      this.createElement = oval.createElement(argumentedDirectives)
-    }
-    ```
-
-  - Updated `create-element` to pass the `createElement` function to every directive along with the `tagName`, `props` and `children`.
-
-  - Example of a directive after these changes:
-
-    ```
-    // converts textarea text to paragraphs
-    module.exports = function (tag) {
-      return function (createElement, tagName, props, ...children) {
-        if (props && props['parse-paragraphs']) {
-          if (!children || !children[0]) {
-            return false
-          }
-          children = children[0].split('\n').map(function (text) {
-            return createElement('p', props, text)
-          })
-          return createElement(tagName, props, children)
-        }
-      }
-    }
-
-    ```
+  - `baseTag`'s `tag.injectDirectives` passes `tag` to every directive:
+  - `create-element` to passes the `createElement` function to every directive along with the `tagName`, `props` and `children`
 
 ### Fixed
 
