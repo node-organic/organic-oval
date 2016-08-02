@@ -53,6 +53,39 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     : null
   }
   ```
+- directives
+
+  - Updated `baseTag`'s `tag.injectDirectives`, so it passes `tag` to every directive:
+
+    ```
+    tag.injectDirectives = function (directives) {
+      tag.directives = directives
+      var argumentedDirectives = directives.map((d) => d(tag))
+      this.createElement = oval.createElement(argumentedDirectives)
+    }
+    ```
+
+  - Updated `create-element` to pass the `createElement` function to every directive along with the `tagName`, `props` and `children`.
+
+  - Example of a directive after these changes:
+
+    ```
+    // converts textarea text to paragraphs
+    module.exports = function (tag) {
+      return function (createElement, tagName, props, ...children) {
+        if (props && props['parse-paragraphs']) {
+          if (!children || !children[0]) {
+            return false
+          }
+          children = children[0].split('\n').map(function (text) {
+            return createElement('p', props, text)
+          })
+          return createElement(tagName, props, children)
+        }
+      }
+    }
+
+    ```
 
 ### Fixed
 
