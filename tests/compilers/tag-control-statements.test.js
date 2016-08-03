@@ -231,4 +231,32 @@ describe('oval-control-statements', function () {
     var compiled = compiler.compile(content)
     expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).to.eq(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
   })
+
+  it('compiles a statement arrow within', function () {
+    var content = `
+      <tag-name>
+        <h1 if={tag.value > 0}
+          class="test-class">
+          test
+        </h1>
+      </tag-name>
+    `
+
+    var expectedCompiledCode = `
+      <tag-name>
+        {
+          tag.value > 0
+            ? (
+              <h1 class="test-class">
+                test
+              </h1>
+            )
+            : null
+        }
+      </tag-name>
+    `
+
+    var compiled = compiler.compile(content)
+    expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).to.eq(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  })
 })
