@@ -2,6 +2,21 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2016-08-03
+
+### API changes
+
+- replaced `unmount` with `unmounted` and introduced `unmount` as before element remove
+- renamed `keepParentTag` with `keepTagName`
+- `tag.shouldRender` is refactored as flag instead of function
+
+### Improved
+
+- README
+
+### Fixed
+- oval control statements
+
 ## [2.0.0] - 2016-08-02
 
 ### API changes

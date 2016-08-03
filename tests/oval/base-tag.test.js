@@ -29,9 +29,12 @@ describe('base-tag', function () {
 
   var TagWithDirectives = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.injectDirectives([function (tagName, props, ...children) {
-      props.class = 'test'
-    }])
+    var directive = function (tag) {
+      return function (createElement, tagName, props, ...children) {
+        props.class = 'test'
+      }
+    }
+    this.injectDirectives([directive])
   }
   TagWithDirectives.prototype.render = function (createElement) {
     return createElement(this.tagName, {})
@@ -39,12 +42,8 @@ describe('base-tag', function () {
 
   var TagShouldRender = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.rendered = false
     this.renderValue = Math.random().toString()
-    this.on('updated', () => { this.rendered = true })
-  }
-  TagShouldRender.prototype.shouldRender = function () {
-    return !this.rendered
+    this.on('updated', () => { this.shouldRender = false })
   }
   TagShouldRender.prototype.render = function (createElement) {
     return createElement(this.tagName, {class: this.renderValue})
@@ -107,14 +106,14 @@ describe('base-tag', function () {
     var el = document.createElement('tag-should-render')
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'tag-should-render')
-    expect(tag.rendered).to.eq(true)
+    expect(tag.shouldRender).to.eq(false)
     var renderValue = tag.renderValue
     expect(el.attributes.class.value).to.eq(renderValue)
     tag.renderValue = 'changed'
-    tag.rendered = false
+    tag.shouldRender = true
     tag.update()
+    expect(tag.shouldRender).to.eq(false)
     expect(el.attributes.class.value).to.eq('changed')
-    expect(tag.rendered).to.eq(true)
     tag.renderValue = 'changed2'
     tag.update()
     expect(el.attributes.class.value).to.eq('changed')

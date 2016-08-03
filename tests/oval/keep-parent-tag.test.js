@@ -4,7 +4,7 @@ describe('keep parent tag', function () {
 
   var Tag = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.keepParentTag = false
+    this.keepTagName = false
     this.testValue = 1
   }
   Tag.prototype.render = function (createElement) {
@@ -19,7 +19,7 @@ describe('keep parent tag', function () {
 
   var ChildTag = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.keepParentTag = false
+    this.keepTagName = false
   }
   ChildTag.prototype.render = function (createElement) {
     return createElement(this.tagName, {}, createElement('span', {class: this.props['custom-value'].test}))
