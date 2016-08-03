@@ -21,7 +21,7 @@ describe('oval', function () {
   })
 
   it('createElement', function () {
-    var createElementFn = oval.createElement([])
+    var createElementFn = oval.createElement()
     var el = createElementFn('div', [])
     expect(el.tagName).to.eq('DIV')
   })

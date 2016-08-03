@@ -29,22 +29,28 @@ describe('base-tag', function () {
 
   var TagWithDirectives = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.injectDirectives([function (tagName, props, ...children) {
-      props.class = 'test'
-    }])
+    var directive = function (tag) {
+      return {
+        preCreate: function (createElement, tagName, props, ...children) {
+          props.class = 'test'
+        },
+        postCreate: function (el) {
+          el.setAttribute('custom', 'value')
+        }
+      }
+    }
+    this.injectDirectives({
+      'test': directive
+    })
   }
   TagWithDirectives.prototype.render = function (createElement) {
-    return createElement(this.tagName, {})
+    return createElement(this.tagName, {test: ''})
   }
 
   var TagShouldRender = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
-    this.rendered = false
     this.renderValue = Math.random().toString()
-    this.on('updated', () => { this.rendered = true })
-  }
-  TagShouldRender.prototype.shouldRender = function () {
-    return !this.rendered
+    this.on('updated', () => { this.shouldRender = false })
   }
   TagShouldRender.prototype.render = function (createElement) {
     return createElement(this.tagName, {class: this.renderValue})
@@ -101,20 +107,22 @@ describe('base-tag', function () {
     oval.mountAt(el, 'custom-tag-with-directives')
 
     expect(el.attributes.class.value).to.eq('test')
+    expect(el.attributes.test.value).to.eq('')
+    expect(el.attributes.custom.value).to.eq('value')
   })
 
   it('shouldRender', function () {
     var el = document.createElement('tag-should-render')
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'tag-should-render')
-    expect(tag.rendered).to.eq(true)
+    expect(tag.shouldRender).to.eq(false)
     var renderValue = tag.renderValue
     expect(el.attributes.class.value).to.eq(renderValue)
     tag.renderValue = 'changed'
-    tag.rendered = false
+    tag.shouldRender = true
     tag.update()
+    expect(tag.shouldRender).to.eq(false)
     expect(el.attributes.class.value).to.eq('changed')
-    expect(tag.rendered).to.eq(true)
     tag.renderValue = 'changed2'
     tag.update()
     expect(el.attributes.class.value).to.eq('changed')
