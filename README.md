@@ -12,7 +12,7 @@ Oval can be used in many ways. There are different setups for each way. Read the
 
 #### install dependencies
 
-`npm i webpack loader-utils babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
+`npm i webpack babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
 
 #### add webpack.config.js
 
