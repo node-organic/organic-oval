@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - README
 
 ### Fixed
+
 - oval control statements
 
 ## [2.0.0] - 2016-08-02

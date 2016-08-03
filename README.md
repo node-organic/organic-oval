@@ -454,10 +454,22 @@ require('global-oval')(oval)
 
 ## Known Issues
 
-1. element with `if` attribute with closing tag on the same line can not be parsed properly
+1. multiline element declaration with `if` attribute will work only when if statement is on the first line
 
-  Wont work:
+  **Won't** work:
 
   ```html
-  <h1 if={condition}>Some Text</h1>
+  <h1 class='test'
+    if={condition}>
+    Some Text
+  </h1>
+  ```
+
+  *Will* work:
+
+  ```html
+  <h1 if={condition}
+    class='test'>
+    Some Text
+  </h1>
   ```
