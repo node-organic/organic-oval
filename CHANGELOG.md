@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - replaced `unmount` with `unmounted` and introduced `unmount` as before element remove
 - renamed `keepParentTag` with `keepTagName`
 - `tag.shouldRender` is refactored as flag instead of function
+- tag directives are refactored to support better dom element augmentation control and less CPU
 
 ### Improved
 

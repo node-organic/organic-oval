@@ -30,14 +30,21 @@ describe('base-tag', function () {
   var TagWithDirectives = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
     var directive = function (tag) {
-      return function (createElement, tagName, props, ...children) {
-        props.class = 'test'
+      return {
+        preCreate: function (createElement, tagName, props, ...children) {
+          props.class = 'test'
+        },
+        postCreate: function (el) {
+          el.setAttribute('custom', 'value')
+        }
       }
     }
-    this.injectDirectives([directive])
+    this.injectDirectives({
+      'test': directive
+    })
   }
   TagWithDirectives.prototype.render = function (createElement) {
-    return createElement(this.tagName, {})
+    return createElement(this.tagName, {test: ''})
   }
 
   var TagShouldRender = function (tagName, root) {
@@ -100,6 +107,8 @@ describe('base-tag', function () {
     oval.mountAt(el, 'custom-tag-with-directives')
 
     expect(el.attributes.class.value).to.eq('test')
+    expect(el.attributes.test.value).to.eq('')
+    expect(el.attributes.custom.value).to.eq('value')
   })
 
   it('shouldRender', function () {

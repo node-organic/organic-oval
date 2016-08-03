@@ -386,27 +386,36 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 
 ### Tag directives
 
-`organic-oval` gives you the functionality to extend the `createElement` function. You can write you directive and inject it in the components that will use it.
+`organic-oval` gives you the functionality to extend the `createElement` function. You can write your directive and inject it in the components that will use it.
+
+A directive is the following module:
 
 ```js
 module.exports = function (tag) {
-  return function (createElement, tagName, props, ...children) {
-    if (props && props['augmentMeWithClick']) {
-      props['onclick'] = function () {
-        alert(props['alert'])
-      }
+  return {
+    preCreate: function (createElement, tagName, props, ...children) {
+      // ... augment props
+      // optionally return new array of children instead of given ones using createElement Fn
+    },
+    postCreate: function (el) {
+      // ... augment `el` dom element
     }
   }
 }
 ```
 
+And can be injected into any tag:
+
 ```html
 <my-tag>
   <script>
-    tag.injectDirectives([require('my-directive')])
+    tag.injectDirectives({
+      'directive-name': require('my-directive')
+    })
   </script>
-  <span>some text</span>
-  <h1 augmentMeWithClick>alert with home</h1>
+  ...
+  <p directive-name>hello directives</p>
+  ...
 </my-tag>
 ```
 
