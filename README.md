@@ -482,3 +482,21 @@ require('global-oval')(oval)
     Some Text
   </h1>
   ```
+
+2. each loops should have `id` on every looped item so that morphdom can properly update them on changes
+
+  **Won't** work:
+
+  ```html
+  <each item in {items}>
+    <div>{item}</div>
+  </each>
+  ```
+
+  *Will* work:
+
+  ```html
+  <each item, index in {items}>
+    <div id={'item' + index}>{item}</div>
+  </each>
+  ```
