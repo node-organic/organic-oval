@@ -12,7 +12,7 @@ Oval can be used in many ways. There are different setups for each way. Read the
 
 #### install dependencies
 
-`npm i webpack babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
+`npm i organic-oval webpack babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
 
 #### add webpack.config.js
 
@@ -454,6 +454,7 @@ require('global-oval')(oval)
 
 ### Lifecycle events
 
+1. `render` - every time before actual dom element render
 1. `mount` - only on mount
 1. `update` - every time when tag is updated (respectively on first mount too)
 1. `updated` - every time after tag is updated
