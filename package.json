@@ -7,9 +7,9 @@
     "test": "npm run test-style && mocha --compilers js:babel-register --require ./tests/setup.js tests/**/*.test.js",
     "test-cov": "babel-node ./node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --require ./tests/setup.js --recursive 'tests/**/*.test.js'",
     "test-style": "eslint ./",
-    "release-patch": "npm run test && npm version patch && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master",
-    "release-minor": "npm run test && npm version minor && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master",
-    "release-major": "npm run test && npm version major && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master"
+    "release-patch": "git checkout develop && git pull origin develop && npm run test && npm version patch && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop",
+    "release-minor": "git checkout develop && git pull origin develop && npm run test && npm version minor && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop",
+    "release-major": "git checkout develop && git pull origin develop && npm run test && npm version major && git push origin develop && git checkout master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop"
   },
   "repository": {
     "type": "git",
