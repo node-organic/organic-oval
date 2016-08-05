@@ -19,7 +19,7 @@ module.exports = {
     var i
     if (selector === '*') {
       for (i = 0; i < this.registeredTags.length; i++) {
-        var els = root.querySelectorAll(this.registeredTags[i].tagName)
+        var els = root.getElementsByTagName(this.registeredTags[i].tagName)
         if (els.length) {
           for (var k = 0; k < els.length; k++) {
             elements.push(els[k])

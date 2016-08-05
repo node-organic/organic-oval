@@ -4,10 +4,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [major.minor.patch] - YYYY-MM-DD
 
+### Added
+
+- `BaseTag.morph()`
+- `BaseTag.updateinnerChildren(sourceEl)` - accepting optional source element
+
 ### Improved
 
 - `BaseTag.injectDirectives()` - every directive accepts `tag` and `directiveName`
 - each loop tests
+- Components with child components rendering
+- Components events
+- `BaseTag.updateAttributes(sourceEl)` - accepts optional source element
+- `BaseTag.updateProps(sourceEl)` - accepts optional source element
+- `BaseTag.updateRefs(sourceEl)` - accepts optional source element
 
 ### Fixed
 
