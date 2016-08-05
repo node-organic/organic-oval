@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [major.minor.patch] - YYYY-MM-DD
+
+### Fixed
+
+- oval `if` control statement edge case with inner tags having the same name of the openning one
+
 ## [3.0.0] - 2016-08-03
 
 ### API changes
