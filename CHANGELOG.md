@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Improved
 
 - `BaseTag.injectDirectives()` - every directive accepts `tag` and `directiveName`
+- each loop tests
 
 ### Fixed
 
