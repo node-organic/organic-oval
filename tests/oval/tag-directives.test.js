@@ -5,17 +5,17 @@ describe('tag directives', function () {
   var Tag = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
     this.injectDirectives({
-      augment1: function (tag) {
+      augment1: function (tag, directiveName) {
         return {
           preCreate: function (createElement, tagName, props, ...children) {
-            props.customValue = props['augment1']
+            props.customValue = props[directiveName]
           }
         }
       },
-      augment2: function (tag) {
+      augment2: function (tag, directiveName) {
         return {
           preCreate: function (createElement, tagName, props, ...children) {
-            props.customValue += props['augment2']
+            props.customValue += props[directiveName]
           }
         }
       }

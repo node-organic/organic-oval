@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [major.minor.patch] - YYYY-MM-DD
 
+### Improved
+
+- `BaseTag.injectDirectives()` - every directive accepts `tag` and `directiveName`
+- each loop tests
+
 ### Fixed
 
 - oval `if` control statement edge case with inner tags having the same name of the openning one

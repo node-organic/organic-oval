@@ -391,7 +391,7 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 A directive is the following module:
 
 ```js
-module.exports = function (tag) {
+module.exports = function (tag, directiveName) {
   return {
     preCreate: function (createElement, tagName, props, ...children) {
       // ... augment props
