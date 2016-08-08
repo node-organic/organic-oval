@@ -46,7 +46,7 @@ module.exports = {
   },
   mountAt: function (el, tagName, props) {
     if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
-    if (el.oval_tag) {
+    if (el.oval_tag && el.tagName === tagName.toUpperCase()) {
       el.oval_tag.update()
       return el.oval_tag
     }
