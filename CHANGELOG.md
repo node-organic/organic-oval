@@ -4,10 +4,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [major.minor.patch] - YYYY-MM-DD
 
-- refactor `BaseTag.render` method
-
-## [3.1.0] - 2016-08-05
-
 ### Added
 
 - `BaseTag.morph()`
