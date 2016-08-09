@@ -10,6 +10,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Improved
 - refactor `BaseTag.render` method
 
+### Fixed
+
+- `if` control statements having multiple expressions within as single line
+
 ## [3.1.0] - 2016-08-05
 
 ### Added
