@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [major.minor.patch] - YYYY-MM-DD
 
+### Added
+- allow every tag instance to pass custom morphdom options via `tag.morphOptions`
+
+### Improved
 - refactor `BaseTag.render` method
 
 ## [3.1.0] - 2016-08-05
