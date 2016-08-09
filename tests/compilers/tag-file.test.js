@@ -14,11 +14,13 @@ describe('oval-compiler', function () {
       oval.BaseTag(this, tagName, root, props)
       var tag = this
       var constructorCode = true
-      this.render = function (createElement) {
-        return <tag-name>
-          <h1>html test</h1>
-        </tag-name>
-      }
+    }
+
+    render (createElement) {
+      var tag = this
+      return <tag-name>
+    <h1>html test</h1>
+  </tag-name>
     }
   }
   oval.registerTag('tag-name', Tag)
@@ -26,6 +28,6 @@ describe('oval-compiler', function () {
 `
 
     var compiled = compiler.compile(content)
-    expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).to.eq(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+    expect(compiled.trim()).to.eq(expectedCompiledCode.trim())
   })
 })
