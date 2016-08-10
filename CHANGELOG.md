@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - `if` control statements having multiple expressions within as single line
+- boolean attributes parsing in `createElement`
 
 ## [3.1.0] - 2016-08-05
 
