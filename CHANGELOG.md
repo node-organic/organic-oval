@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - allow every tag instance to pass custom morphdom options via `tag.morphOptions`
+- custom tag attribute `freeze`
 
 ### Improved
 - refactor `BaseTag.render` method
