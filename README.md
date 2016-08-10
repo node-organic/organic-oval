@@ -455,12 +455,36 @@ require('global-oval')(oval)
 ### Lifecycle events
 
 1. `render` - every time before actual dom element render
-1. `mount` - only on mount
+  * use this event to modify tag's state to be rendered into `tag.view`
+1. `mount` - only once on mount
 1. `update` - every time when tag is updated (respectively on first mount too)
+  * use this event to modify `tag.view` which will be used to patch `tag.root`
 1. `updated` - every time after tag is updated
+  * use this event to modify `tag.root`
 1. `mounted` - only once tag is mounted and updated
 1. `unmount` - when tag is going to be removed
+  * use this event to destroy any runtime allocated resources
 1. `unmounted` - when tag is removed
+
+### freeze dom elements
+
+```
+<my-tag>
+  <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
+</my-tag>
+```
+
+### BaseTag morphOptions
+
+```
+<my-tag>
+  <script>
+    tag.morphOptions = {
+      // morphdom options to be used for updating tag.root from tag's template view
+    }
+  </script>
+</my-tag>
+```
 
 ## Known Issues
 
