@@ -1,4 +1,6 @@
 describe('named refs', function () {
+  require('../env')()
+
   var oval
   var customTagInstance
 
@@ -6,12 +8,10 @@ describe('named refs', function () {
     oval.BaseTag(this, tagName, root)
   }
   Tag.prototype.render = function (createElement) {
-    return createElement(this.tagName, {},
-      createElement('div', {},
-        createElement('form', {
-          'ref': 'childRef'
-        })
-      )
+    return createElement('div', {},
+      createElement('form', {
+        'ref': 'childRef'
+      })
     )
   }
   before(function () {

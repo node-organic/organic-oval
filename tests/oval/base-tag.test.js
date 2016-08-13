@@ -1,19 +1,21 @@
 describe('base-tag', function () {
+  require('../env')()
+
   var oval
   var customTagInstance
   var parentCustomTagInstance
-  var Tag = function (tagName, root) {
-    oval.BaseTag(this, tagName, root)
+  var Tag = function (root) {
+    oval.BaseTag(this, root)
   }
   Tag.prototype.render = function (createElement) {
-    return createElement(this.tagName, {})
+    return createElement('span', {})
   }
 
   var ParentTag = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
   }
   ParentTag.prototype.render = function (createElement) {
-    return createElement(this.tagName, {}, createElement('custom-tag'))
+    return createElement('custom-tag')
   }
 
   var TagWithEvents = function (tagName, root) {
@@ -24,7 +26,7 @@ describe('base-tag', function () {
     this.on('mounted', () => { this.mountedCalled = true })
   }
   TagWithEvents.prototype.render = function (createElement) {
-    return createElement(this.tagName, {})
+    return createElement('span', {})
   }
 
   var TagWithDirectives = function (tagName, root) {
@@ -44,7 +46,7 @@ describe('base-tag', function () {
     })
   }
   TagWithDirectives.prototype.render = function (createElement) {
-    return createElement(this.tagName, {test: ''})
+    return createElement('span', {test: ''})
   }
 
   var TagShouldRender = function (tagName, root) {
@@ -53,7 +55,7 @@ describe('base-tag', function () {
     this.on('updated', () => { this.shouldRender = false })
   }
   TagShouldRender.prototype.render = function (createElement) {
-    return createElement(this.tagName, {class: this.renderValue})
+    return createElement('span', {class: this.renderValue})
   }
 
   before(function () {
@@ -105,41 +107,41 @@ describe('base-tag', function () {
     var el = document.createElement('custom-tag-with-directives')
     document.body.appendChild(el)
     oval.mountAt(el, 'custom-tag-with-directives')
-
-    expect(el.attributes.class.value).to.eq('test')
-    expect(el.attributes.test.value).to.eq('')
-    expect(el.attributes.custom.value).to.eq('value')
+    var target = el.children[0]
+    expect(target.attributes.class.value).to.eq('test')
+    expect(target.attributes.test.value).to.eq('')
+    expect(target.attributes.custom.value).to.eq('value')
   })
 
   it('shouldRender', function () {
     var el = document.createElement('tag-should-render')
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'tag-should-render')
+    var target = el.children[0]
     expect(tag.shouldRender).to.eq(false)
     var renderValue = tag.renderValue
-    expect(el.attributes.class.value).to.eq(renderValue)
+    expect(target.attributes.class.value).to.eq(renderValue)
     tag.renderValue = 'changed'
     tag.shouldRender = true
     tag.update()
     expect(tag.shouldRender).to.eq(false)
-    expect(el.attributes.class.value).to.eq('changed')
+    expect(target.attributes.class.value).to.eq('changed')
     tag.renderValue = 'changed2'
     tag.update()
-    expect(el.attributes.class.value).to.eq('changed')
+    expect(target.attributes.class.value).to.eq('changed')
   })
 
   it('unmounts', function () {
     customTagInstance.unmount()
-    expect(customTagInstance.lifecycle.mounted).to.eq(false)
+    expect(customTagInstance.mounted).to.eq(false)
     expect(customTagInstance.root.parentNode).to.not.exist
   })
 
   it('unmounts with children', function () {
     parentCustomTagInstance.unmount()
-    expect(parentCustomTagInstance.tagName).to.eq('parent-custom-tag')
-    expect(parentCustomTagInstance.lifecycle.mounted).to.eq(false)
+    expect(parentCustomTagInstance.mounted).to.eq(false)
     expect(parentCustomTagInstance.root.parentNode).to.not.exist
-    expect(parentCustomTagInstance.childTags[0].lifecycle.mounted).to.eq(false)
-    expect(parentCustomTagInstance.childTags[0].root.parentNode).to.exist
+    expect(parentCustomTagInstance.root.children[0].tag.mounted).to.eq(false)
+    expect(parentCustomTagInstance.root.children[0].parentNode).to.exist
   })
 })

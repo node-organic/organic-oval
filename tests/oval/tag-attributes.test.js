@@ -1,4 +1,6 @@
 describe('tag attributes', function () {
+  require('../env')()
+
   var oval
   var customTagInstance
 
@@ -6,7 +8,7 @@ describe('tag attributes', function () {
     oval.BaseTag(this, tagName, root)
   }
   Tag.prototype.render = function (createElement) {
-    return createElement(this.tagName, this.attributes)
+    return createElement('div', this.attributes)
   }
   before(function () {
     window.document.body.innerHTML = ''

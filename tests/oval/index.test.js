@@ -1,4 +1,6 @@
 describe('oval', function () {
+  require('../env')()
+
   var oval
   var Tag = function (tagName, root) {
     oval.BaseTag(this, tagName, root)
@@ -20,20 +22,6 @@ describe('oval', function () {
     expect(oval.BaseTag).to.exist
   })
 
-  it('createElement', function () {
-    var createElementFn = oval.createElement()
-    var el = createElementFn('div', [])
-    expect(el.tagName).to.eq('DIV')
-  })
-
-  it('updateElement', function () {
-    var createElementFn = oval.createElement([])
-    var el = createElementFn('div', {})
-    var el2 = createElementFn('div', {class: 'test'})
-    oval.updateElement(el, el2)
-    expect(el2.attributes.class.value).to.eq('test')
-  })
-
   it('registerTag', function () {
     oval.registerTag('custom-tag', Tag)
     expect(oval.registeredTags.length).to.eq(1)
@@ -47,15 +35,8 @@ describe('oval', function () {
   it('mountAll(*)', function () {
     var el = document.createElement('custom-tag')
     document.body.appendChild(el)
-    var tags = oval.mountAll('*', window.document)
-    expect(tags.length).to.eq(1)
-  })
-
-  it('mountAll(selector)', function () {
-    var el = document.createElement('custom-tag')
-    document.body.appendChild(el)
-    var tags = oval.mountAll('custom-tag', window.document)
-    expect(tags.length).to.eq(1)
+    oval.mountAll(document.body)
+    expect(document.body.children.length).to.eq(1)
   })
 
   it('appendAt', function () {
