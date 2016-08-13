@@ -10,14 +10,17 @@ describe('oval-compiler', function () {
 `
 
     var expectedCompiledCode = `class Tag {
-    constructor (tagName, root, props) {
-      oval.BaseTag(this, tagName, root, props)
+    constructor (root, props, attrs) {
       var tag = this
+      var tagAttrs = {}
+      attrs = attrs || {}
+      for (var key in tagAttrs) {
+        attrs[key] = attrs[key] || tagAttrs[key]
+      }
+      oval.BaseTag(tag, root, props, attrs)
       var constructorCode = true
-      this.render = function (createElement) {
-        return <tag-name>
-          <h1>html test</h1>
-        </tag-name>
+      tag.render = function (createElement) {
+        return <virtual><h1>html test</h1></virtual>
       }
     }
   }

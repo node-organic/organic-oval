@@ -1,6 +1,4 @@
 module.exports = {
-  updateElement: require('./lib/update-element'),
-  createElement: require('./lib/create-element'),
   registeredTags: [],
   init: function (plasma) {
     this.plasma = require('./lib/organic-plasma-dom')(plasma)
@@ -13,61 +11,52 @@ module.exports = {
       }
     }
   },
-  mountAll: function (selector, root) {
-    if (!selector || !root) throw new Error(arguments + ' supplied should have selector and root')
-    var elements = []
+  mountAll: function (root) {
+    var pairs = []
+    var k
     var i
-    if (selector === '*') {
-      for (i = 0; i < this.registeredTags.length; i++) {
-        var els = root.getElementsByTagName(this.registeredTags[i].tagName)
-        if (els.length) {
-          for (var k = 0; k < els.length; k++) {
-            elements.push(els[k])
-          }
-        }
+    var pair
+    // buffer all elements from root
+    for (k = 0; k < this.registeredTags.length; k++) {
+      pair = this.registeredTags[k]
+      var elements = root.querySelectorAll(pair.tagName)
+      for (i = 0; i < elements.length; i++) {
+        pairs.push({el: elements[i], Tag: pair.Tag})
       }
-    } else {
-      elements = root.querySelectorAll(selector)
     }
+    // initialize
     var tags = []
-    for (i = 0; i < elements.length; i++) {
-      if (elements[i].oval_tag) {
-        elements[i].oval_tag.update()
-        tags.push(elements[i].oval_tag)
-        continue
-      }
-      var name = elements[i].tagName
-      var Tag = this.getRegisteredTag(name)
-      var instance = new Tag(name, elements[i])
-      instance.update()
+    for (i = 0; i < pairs.length; i++) {
+      pair = pairs[i]
+      var TagClass = pair.Tag
+      var instance = new TagClass(pair.el)
+      instance.mount()
       tags.push(instance)
     }
     return tags
   },
-  mountAt: function (el, tagName, props) {
-    if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
-    if (el.oval_tag) {
-      el.oval_tag.update()
-      return el.oval_tag
-    }
-    var Tag = this.getRegisteredTag(tagName)
-    var instance = new Tag(tagName, el, props)
-    instance.update()
+  mountAt: function (el, tagName, props, attrs) {
+    var TagClass = this.getRegisteredTag(tagName)
+    if (!TagClass) throw new Error(tagName + ' not registered')
+    var instance = new TagClass(el, props, attrs)
+    instance.mount()
     return instance
   },
-  appendAt: function (el, tagName, props) {
-    if (!el || !tagName) throw new Error(arguments + ' supplied should have el and tagName')
-    var Tag = this.getRegisteredTag(tagName)
-    var instance = new Tag(tagName, document.createElement(tagName), props)
-    instance.update()
-    el.appendChild(instance.root)
+  appendAt: function (el, tagName, props, attrs) {
+    var TagClass = this.getRegisteredTag(tagName)
+    if (!TagClass) throw new Error(tagName + ' not registered')
+    var newEl = document.createElement(tagName)
+    el.appendChild(newEl)
+    var instance = new TagClass(newEl, props, attrs)
+    instance.mount()
     return instance
   },
   registerTag: function (tagName, TagClass) {
     if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
     this.registeredTags.push({
-      tagName: tagName,
+      tagName: tagName.toLowerCase(),
       Tag: TagClass
     })
+    return TagClass
   }
 }

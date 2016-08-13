@@ -1,9 +1,11 @@
 describe('tag directives', function () {
+  require('../env')()
+
   var oval
   var customTagInstance
 
-  var Tag = function (tagName, root) {
-    oval.BaseTag(this, tagName, root)
+  var Tag = function (root, props, attrs) {
+    oval.BaseTag(this, root, props, attrs)
     this.injectDirectives({
       augment1: function (tag, directiveName) {
         return {
@@ -22,11 +24,11 @@ describe('tag directives', function () {
     })
   }
   Tag.prototype.render = function (createElement) {
-    return createElement(this.tagName, this.attributes)
+    return createElement('div', this.attributes)
   }
 
-  var TagWithNewChildren = function (tagName, root) {
-    oval.BaseTag(this, tagName, root)
+  var TagWithNewChildren = function (root, props, attrs) {
+    oval.BaseTag(this, root, props, attrs)
     this.injectDirectives({
       augment: function (tag) {
         return {
@@ -38,7 +40,7 @@ describe('tag directives', function () {
     })
   }
   TagWithNewChildren.prototype.render = function (createElement) {
-    return createElement(this.tagName, this.attributes)
+    return createElement('div', this.attributes)
   }
 
   before(function () {
@@ -53,17 +55,15 @@ describe('tag directives', function () {
 
   it('mount and renders', function () {
     var el = document.createElement('custom-tag')
-    el.setAttribute('augment1', '4')
-    el.setAttribute('augment2', '2')
     document.body.appendChild(el)
-    var tag = oval.mountAt(el, 'custom-tag')
-    expect(el.getAttribute('customValue')).to.eq('42')
+    var tag = oval.mountAt(el, 'custom-tag', {}, {'augment1': '4', 'augment2': '2'})
+    expect(el.children[0].getAttribute('customValue')).to.eq('42')
     customTagInstance = tag
   })
 
   it('re-renders', function () {
     customTagInstance.update()
-    expect(document.body.children[0].attributes.customvalue.value).to.eq('42')
+    expect(customTagInstance.root.children[0].attributes.customvalue.value).to.eq('42')
   })
 
   it('replaces children', function () {

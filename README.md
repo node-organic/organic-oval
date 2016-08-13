@@ -75,7 +75,9 @@ oval.init()
 register tag with given implementation
 
 ```js
-var MyTagClass = function (tagName, rootEl, props) {}
+var MyTagClass = function (rootEl, props, attrs) {
+  oval.BaseTag(this, rootEl, props, attrs)
+}
 
 oval.registerTag('my-tag', MyTagClass)
 ```
@@ -88,21 +90,21 @@ gets the tag class from registered tags by name
 var MyTagClass = oval.getRegisteredTag('my-tag')
 ```
 
-### oval.mountAll(selector, root)
+### oval.mountAll(root)
 
-mount and update any tags under `selector` & `root`, special selector value (`"*"`) to mount any tags found from registered
+mount and update any tags under `root`
 
 Returns all mounted tags as Array
 
 ```js
 // mount all registered tags found on body
-oval.mountAll('*', window.document.body)
+oval.mountAll(window.document.body)
 
 // mount all tags matching registered having ovalTag attribute recursively at domElement
-oval.mountAll('[ovalTag]', domElement)
+oval.mountAll(domElement)
 ```
 
-### oval.appendAt(el, tagName, props)
+### oval.appendAt(el, tagName, props, attrs)
 
 append, mount and update a new tag instance to given `el` by `tagName`. This method appends the tag to the given element.
 
@@ -110,7 +112,7 @@ append, mount and update a new tag instance to given `el` by `tagName`. This met
 oval.appendAt(window.document.body, 'my-tag')
 ```
 
-### oval.mountAt(el, tagName, props)
+### oval.mountAt(el, tagName, props, attrs)
 
 mount and update a new tag instance to given `el` by `tagName`. This method overrides given element with the tag instance
 
@@ -242,7 +244,7 @@ Setting an attribute to nested component is just like setting an attribute to a 
     ...
   </script>
   ...
-  <navigation-item class="item" ...>...</navigation-item>
+  <navigation-item class="item" data-value='42' ...>...</navigation-item>
   ...
 </navigation>
 
@@ -254,14 +256,6 @@ Setting an attribute to nested component is just like setting an attribute to a 
 </navigation-item>
 ```
 
-##### Keep tag attributes from parent to child
-
-```html
-<navigation-item {...tag.attributes}>
-  <div></div>
-</navigation-item>
-```
-
 #### By reference as property
 
 Passing a property by reference makes it available as `tag.props.link` in the nested tag's logic.
@@ -270,10 +264,11 @@ Passing a property by reference makes it available as `tag.props.link` in the ne
 <navigation>
   <script>
     require('./navigation-item')
+    tag.myVariable = {title: 'Home', href: '#home'}
     ...
   </script>
   ...
-  <navigation-item prop-link={{title: 'Home', href: '#home'}}...>
+  <navigation-item prop-link={tag.myVariable}...>
     ...
   </navigation-item>
   ...
@@ -335,40 +330,6 @@ Passing a property by reference makes it available as `tag.props.link` in the ne
   </ul>
 </navigation>
 ```
-
-### control rendering of custom tag names
-
-By default `organic-oval` will render custom tag names, however there are cases where DOM doesn't likes this approach and can be altered via `tag.keepTagName` option.
-
-See the following scenario as example:
-
-* `list-container.tag`
-
-  ```html
-  <list-container>
-    <script>
-      require('./my-list-item')
-    </script>
-    <ul>
-      <each item, itemIndex in {tag.items}>
-        <my-list-item prop-value={item} prop-values={tag.items} />
-      </each>
-    </ul>
-  </list-container>
-  ```
-
-* `my-list-item.tag`
-
-  ```html
-  <my-list-item>
-    <script>
-      this.keepTagName = false
-    </script>
-    <li>
-      {tag.props.value}
-    </li>
-  </my-list-item>
-  ```
 
 ### control re-rendering of tags
 
@@ -441,8 +402,8 @@ Check out the [**directive example**](https://github.com/camplight/organic-oval-
 module.exports = function (oval) {
   var oldBaseTag = oval.BaseTag
   var myGlobalDirectives = [...]
-  oval.BaseTag = function (tag, tagName, rootEl, props) {
-    oldBaseTag(tag, tagName, rootEl, props)
+  oval.BaseTag = function (tag, rootEl, props, attrs) {
+    oldBaseTag(tag, rootEl, props, attrs)
     tag.injectDirectives(myGlobalDirectives)
   }
 }
@@ -454,8 +415,6 @@ require('global-oval')(oval)
 
 ### Lifecycle events
 
-1. `render` - every time before actual dom element render
-  * use this event to modify tag's state to be rendered into `tag.view`
 1. `mount` - only once on mount
 1. `update` - every time when tag is updated (respectively on first mount too)
   * use this event to modify `tag.view` which will be used to patch `tag.root`
@@ -471,18 +430,6 @@ require('global-oval')(oval)
 ```
 <my-tag>
   <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
-</my-tag>
-```
-
-### BaseTag morphOptions
-
-```
-<my-tag>
-  <script>
-    tag.morphOptions = {
-      // morphdom options to be used for updating tag.root from tag's template view
-    }
-  </script>
 </my-tag>
 ```
 
@@ -508,9 +455,9 @@ require('global-oval')(oval)
   </h1>
   ```
 
-2. each loops should have `id` on every looped item so that morphdom can properly update them on changes
+2. each loops should have `cid` on every looped item so that incremental-dom can properly update them on changes
 
-  **Won't** work:
+  **Won't** work with dynamic `items`:
 
   ```html
   <each item in {items}>
@@ -522,6 +469,6 @@ require('global-oval')(oval)
 
   ```html
   <each item, index in {items}>
-    <div id={'item' + index}>{item}</div>
+    <div cid={index}>{item}</div>
   </each>
   ```

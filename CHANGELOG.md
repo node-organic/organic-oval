@@ -4,12 +4,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [major.minor.patch] - YYYY-MM-DD
 
-### Added
-- allow every tag instance to pass custom morphdom options via `tag.morphOptions`
-- custom tag attribute `freeze`
+### API CHANGES
 
-### Improved
-- refactor `BaseTag.render` method
+- removed `tag.keepTagName`
+- `oval.mountAll`
+- `oval.appendAt`
+- `oval.mountAt`
+- `oval.BaseTag`
+- replaced `morphdom` with `incremental-dom`
+
+### Added
+- custom tag attribute `freeze`
 
 ### Fixed
 
