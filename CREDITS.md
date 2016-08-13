@@ -1,8 +1,4 @@
-# based on source code from
+# CREDITS
 
-* [`yo-yo`](https://github.com/maxogden/yo-yo) for `lib/update-element.js` & `lib/dom-events.js`
-* [`bel`](https://github.com/shama/bel) for `lib/create-element.js`
-
-# based on
-
-* [`morhpdom`](https://github.com/patrick-steele-idem/morphdom)
+* rendering uses [`incremental-dom`](https://github.com/google/incremental-dom)
+* `lib/incremental-create-element.js` is based on [`incremental-dom-react-helper`](https://github.com/thejameskyle/incremental-dom-react-helper)

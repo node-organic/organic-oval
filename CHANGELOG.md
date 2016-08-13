@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [major.minor.patch] - YYYY-MM-DD
+## [4.0.0] - 2016-08-13
 
 ### API CHANGES
 
@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - replaced `morphdom` with `incremental-dom`
 
 ### Added
+
 - custom tag attribute `freeze`
 
 ### Fixed
