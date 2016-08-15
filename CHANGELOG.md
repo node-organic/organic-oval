@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [major.minor.patch] - YYYY-MM-DD
+
+### Fixed
+
+- BaseTag `update` event is fired after tag props/attrs are updated
+
 ## [4.0.0] - 2016-08-13
 
 ### API CHANGES
