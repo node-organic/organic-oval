@@ -18,6 +18,9 @@ describe('tag directives', function () {
         return {
           preCreate: function (createElement, tagName, props, ...children) {
             props.customValue += props[directiveName]
+          },
+          postCreate: function (el) {
+            el.setAttribute('postCreated', 'true')
           }
         }
       }
@@ -58,6 +61,7 @@ describe('tag directives', function () {
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'custom-tag', {}, {'augment1': '4', 'augment2': '2'})
     expect(el.children[0].getAttribute('customValue')).to.eq('42')
+    expect(el.children[0].getAttribute('postCreated')).to.eq('true')
     customTagInstance = tag
   })
 
