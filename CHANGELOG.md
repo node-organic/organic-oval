@@ -7,6 +7,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - BaseTag `update` event is fired after tag props/attrs are updated
+- Oval Directives `postCreate` is not triggered
+
+### Improved
+
+- Oval Directives `postCreate(el, value)`
+- Oval Directives automatically delete directive's property once consumed
+- Oval Directives README section
 
 ## [4.0.0] - 2016-08-13
 

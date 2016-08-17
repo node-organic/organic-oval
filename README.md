@@ -357,8 +357,9 @@ module.exports = function (tag, directiveName) {
     preCreate: function (createElement, tagName, props, ...children) {
       // ... augment props
       // optionally return new array of children instead of given ones using createElement Fn
+      var directiveValue = props[directiveName]
     },
-    postCreate: function (el) {
+    postCreate: function (el, directiveValue) {
       // ... augment `el` dom element
     }
   }
