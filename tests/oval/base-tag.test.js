@@ -109,7 +109,7 @@ describe('base-tag', function () {
     oval.mountAt(el, 'custom-tag-with-directives')
     var target = el.children[0]
     expect(target.attributes.class.value).to.eq('test')
-    expect(target.attributes.test.value).to.eq('')
+    expect(target.attributes.test).to.not.exist
     expect(target.attributes.custom.value).to.eq('value')
   })
 
