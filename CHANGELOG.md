@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 - BaseTag `update` event is fired after tag props/attrs are updated
 - Oval Directives `postCreate` is not triggered
+- Set root attributes only for compiled tag files
 
 ### Improved
 

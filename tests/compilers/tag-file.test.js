@@ -13,9 +13,8 @@ describe('oval-compiler', function () {
     constructor (root, props, attrs) {
       var tag = this
       var tagAttrs = {}
-      attrs = attrs || {}
       for (var key in tagAttrs) {
-        attrs[key] = attrs[key] || tagAttrs[key]
+        root.setAttribute(key, tagAttrs[key])
       }
       oval.BaseTag(tag, root, props, attrs)
       var constructorCode = true
