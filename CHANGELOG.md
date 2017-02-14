@@ -2,11 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## *[4.1.2]* - YYYY-MM-DD
+## *[4.2.0]* - YYYY-MM-DD
 
 ### Fixed
 
 - BaseTag `update` method to properly assign `tag.attributes`
+
+### Added
+
+- `tagName(tagName, props)` support for directives which need to change rendered tagName
+
+### Improved
+
+- `README.md` with known issue 3
 
 ## [4.1.0] - 2016-08-25
 

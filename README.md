@@ -356,11 +356,17 @@ module.exports = function (tag, directiveName) {
   return {
     preCreate: function (createElement, tagName, props, ...children) {
       // ... augment props
-      // optionally return new array of children instead of given ones using createElement Fn
       var directiveValue = props[directiveName]
+      // optionally return new array of children instead of given ones using createElement Fn
+      // example: return [createElement('div'), createElement('my-component')]
     },
     postCreate: function (el, directiveValue) {
       // ... augment `el` dom element
+    },
+    tagName: function (tagName, props) {
+      // return different tagName value
+      var newTagNameValue = props[directiveName]
+      return newTagNameValue
     }
   }
 }
@@ -472,4 +478,20 @@ require('global-oval')(oval)
   <each item, index in {items}>
     <div cid={index}>{item}</div>
   </each>
+  ```
+
+3. conditional rendered sibling tags with same name should have `cid` so that incremental-dom can properly update them on changes
+
+  **Won't** work with conditional tags:
+
+  ```html
+  <div if={condition1}>...</div>
+  <div if={condition2}>...</div>
+  ```
+
+  *Will* work:
+
+  ```html
+  <div if={condition1} cid='value1'>...</div>
+  <div if={condition2} cid='value2'>...</div>
   ```
