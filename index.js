@@ -4,6 +4,14 @@ module.exports = {
     this.plasma = require('./lib/organic-plasma-dom')(plasma)
     this.BaseTag = require('./lib/base-tag')(this)
   },
+  registerTag: function (tagName, TagClass) {
+    if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
+    this.registeredTags.push({
+      tagName: tagName.toLowerCase(),
+      Tag: TagClass
+    })
+    return TagClass
+  },
   getRegisteredTag: function (name) {
     for (var i = 0; i < this.registeredTags.length; i++) {
       if (this.registeredTags[i].tagName === name.toLowerCase()) {
@@ -50,13 +58,5 @@ module.exports = {
     var instance = new TagClass(newEl, props, attrs)
     instance.mount()
     return instance
-  },
-  registerTag: function (tagName, TagClass) {
-    if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
-    this.registeredTags.push({
-      tagName: tagName.toLowerCase(),
-      Tag: TagClass
-    })
-    return TagClass
   }
 }

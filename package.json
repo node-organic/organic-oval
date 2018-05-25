@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/camplight/organic-oval#readme",
   "dependencies": {
-    "incremental-dom": "^0.4.1"
+    "camelcase": "^5.0.0",
+    "incremental-dom": "^0.5.0"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",

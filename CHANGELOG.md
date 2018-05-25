@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.0.0] - YYYY-MM-DD
+
+### Breaking changes
+
+* `oval.BaseTag` is class implementation
+* compiled `.tag` files represent class implementations extending `oval.BaseTag`
+
+### Changed
+
+* organic-plasma-dom module implementation proxies emit/listen to given plasma allowing interaction with organelles outside of dom.
+
 ## *[4.2.0]* - 2017-03-12
 
 ### Fixed
