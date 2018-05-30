@@ -1,62 +1,69 @@
-module.exports = {
-  registeredTags: [],
-  init: function (plasma) {
-    this.plasma = require('./lib/organic-plasma-dom')(plasma)
-    this.BaseTag = require('./lib/base-tag')(this)
-  },
-  registerTag: function (tagName, TagClass) {
-    if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
-    this.registeredTags.push({
-      tagName: tagName.toLowerCase(),
-      Tag: TagClass
+const { h, render, Component } = require('preact')
+const hyperx = require('hyperx')
+const Empty = () => null
+const hx = hyperx((tag, props, kids) => {
+  if (!props.ref) {
+    let dataProps = {}
+    let handlers = {}
+    for (let key in props) {
+      if (typeof props[key] === 'object') {
+        dataProps[key] = props[key]
+        delete props[key]
+      }
+      if (typeof props[key] === 'function') {
+        handlers[key] = props[key]
+        delete props[key]
+      }
+    }
+    props.ref = function (el) {
+      if (el) {
+        for(let key in dataProps) {
+          el[key] = dataProps[key]
+        }
+        for (let key in handlers) {
+          el.addEventListener(key, handlers[key])
+        }
+      }
+    }
+  }
+  return h(tag, props, kids)
+})
+
+module.exports.WebComponent = class WebComponent extends HTMLElement {
+  static define (tagName) {
+    customElements.define(tagName, this)
+  }
+  constructor () {
+    super()
+    this.html = hx
+    this.attachShadow({mode: 'open'})
+  }
+  render () {}
+  update () {
+    this.emit('update')
+    this._root = render(this.render(), this.shadowRoot, this._root)
+    this.emit('updated')
+  }
+  connectedCallback () {
+    this.emit('mount')
+    this.update()
+    this.emit('mounted')
+  }
+  attributeChangedCallback () {
+    this.update()
+  }
+  detachedCallback () {
+    this.emit('unmount')
+    // TODO? 
+    this.emit('unmounted')
+  }
+  on (eventName, eventHandler) {
+    this.addEventListener(eventName, eventHandler)
+  }
+  emit (eventName, eventData) {
+    let e = new CustomEvent(eventName, {
+      detail: eventData
     })
-    return TagClass
-  },
-  getRegisteredTag: function (name) {
-    for (var i = 0; i < this.registeredTags.length; i++) {
-      if (this.registeredTags[i].tagName === name.toLowerCase()) {
-        return this.registeredTags[i].Tag
-      }
-    }
-  },
-  mountAll: function (root) {
-    var pairs = []
-    var k
-    var i
-    var pair
-    // buffer all elements from root
-    for (k = 0; k < this.registeredTags.length; k++) {
-      pair = this.registeredTags[k]
-      var elements = root.querySelectorAll(pair.tagName)
-      for (i = 0; i < elements.length; i++) {
-        pairs.push({el: elements[i], Tag: pair.Tag})
-      }
-    }
-    // initialize
-    var tags = []
-    for (i = 0; i < pairs.length; i++) {
-      pair = pairs[i]
-      var TagClass = pair.Tag
-      var instance = new TagClass(pair.el)
-      instance.mount()
-      tags.push(instance)
-    }
-    return tags
-  },
-  mountAt: function (el, tagName, props, attrs) {
-    var TagClass = this.getRegisteredTag(tagName)
-    if (!TagClass) throw new Error(tagName + ' not registered')
-    var instance = new TagClass(el, props, attrs)
-    instance.mount()
-    return instance
-  },
-  appendAt: function (el, tagName, props, attrs) {
-    var TagClass = this.getRegisteredTag(tagName)
-    if (!TagClass) throw new Error(tagName + ' not registered')
-    var newEl = document.createElement(tagName)
-    el.appendChild(newEl)
-    var instance = new TagClass(newEl, props, attrs)
-    instance.mount()
-    return instance
+    this.dispatchEvent(e)
   }
 }
