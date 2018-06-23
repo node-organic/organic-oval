@@ -28,7 +28,7 @@
     "hyperhtml-element": "^1.7.0",
     "hypermorphic": "^0.5.0",
     "hyperx": "^2.4.0",
-    "incremental-dom": "^0.5.0",
+    "incremental-dom": "^0.5.1",
     "morphdom": "^2.3.3",
     "preact": "^8.2.9",
     "preact-custom-element": "^3.0.0",
