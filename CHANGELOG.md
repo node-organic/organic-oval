@@ -4,14 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [5.0.0] - YYYY-MM-DD
 
+:warning: this release breaks towards 4.2.0 completely. :warning:
+
 ### Breaking changes
 
-* `oval.BaseTag` is class implementation
-* compiled `.tag` files represent class implementations extending `oval.BaseTag`
-
-### Changed
-
-* organic-plasma-dom module implementation proxies emit/listen to given plasma allowing interaction with organelles outside of dom.
+* `compilers/tag-file` - delegates all js specific component definition to *the runtime*
+* `index.js` - represents an singleton commonjs module aka *the runtime*
+* `directives` are removed
 
 ## *[4.2.0]* - 2017-03-12
 

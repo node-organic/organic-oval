@@ -2,17 +2,16 @@
 
 organic front-end components as custom HTML tags
 
-**Check out [organic-oval-examples](https://github.com/camplight/organic-oval-examples) for example usages of `organic-oval`**
+**Check out** 
 
-## Setup
+* [organic-oval-examples](https://github.com/camplight/organic-oval-examples)
+* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
 
-Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you. You can check out all example setups and test them out [**here**](https://github.com/camplight/organic-oval-examples/tree/master/setups)
-
-### quick setup
+### quick start
 
 #### install dependencies
 
-`npm i organic-oval webpack babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
+`npm i organic-oval webpack`
 
 #### add webpack.config.js
 
@@ -21,36 +20,17 @@ var webpack = require('webpack')
 
 module.exports = {
   'resolve': {
-    'extensions': ['', '.webpack.js', '.web.js', '.tag', '.js'],
-    'modulesDirectories': ['web_modules', 'node_modules']
+    'extensions': ['.webpack.js', '.web.js', '.js', '.tag'],
   },
-  'plugins': [
-    new webpack.ProvidePlugin({
-      'oval': 'organic-oval'
-    })
-  ],
   'module': {
-    'preLoaders': [
+    'rules': [
       {
         test: /\.tag$/,
         exclude: /node_modules/,
-        loaders: [
-          'organic-oval/webpack/oval-loader',
-          'organic-oval/webpack/oval-control-statements-loader'
+        use: [
+          {loader: 'organic-oval/webpack/oval-loader'},
+          {loader: 'organic-oval/webpack/oval-control-statements-loader'}
         ]
-      }
-    ],
-    'loaders': [
-      {
-        test: /\.js$|\.tag$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          plugins: [
-            ['transform-react-jsx', { pragma: 'createElement' }]
-          ],
-          presets: ['es2015']
-        }
       }
     ]
   }
@@ -58,168 +38,54 @@ module.exports = {
 
 ```
 
-## API
-
-### oval.init(plasma)
-
-initializes `organic-oval` with *optional* plasma instance
+### use
 
 ```js
-var oval = require('organic-oval')
-oval.init()
-...
+// dist/bundle.js
+let oval = require('organic-oval')
+Object.assign(oval, require('organic-oval/engines/incremental-dom'))
+require('./components/my-app.tag')
 ```
-
-### oval.registerTag(tagName, TagClass)
-
-register tag with given implementation
-
-```js
-var MyTagClass = function (rootEl, props, attrs) {
-  oval.BaseTag(this, rootEl, props, attrs)
-}
-
-oval.registerTag('my-tag', MyTagClass)
-```
-
-### oval.getRegisteredTag(name)
-
-gets the tag class from registered tags by name
-
-```js
-var MyTagClass = oval.getRegisteredTag('my-tag')
-```
-
-### oval.mountAll(root)
-
-mount and update any tags under `root`
-
-Returns all mounted tags as Array
-
-```js
-// mount all registered tags found on body
-oval.mountAll(window.document.body)
-
-// mount all tags matching registered having ovalTag attribute recursively at domElement
-oval.mountAll(domElement)
-```
-
-### oval.appendAt(el, tagName, props, attrs)
-
-append, mount and update a new tag instance to given `el` by `tagName`. This method appends the tag to the given element.
-
-```js
-oval.appendAt(window.document.body, 'my-tag')
-```
-
-### oval.mountAt(el, tagName, props, attrs)
-
-mount and update a new tag instance to given `el` by `tagName`. This method overrides given element with the tag instance
-
-```js
-oval.mountAt(window.document.body, 'my-app-tag')
-```
-
-### oval.BaseTag(tag, tagName, rootEl, props)
-
-Tag constructor Function
-
-```js
-class MyTag {
-  constructor (tagName, rootEl, props) {
-    oval.BaseTag(this, tagName, rootEl, props)
-  }
-}
-```
-
-## Oval Tags Usage
-
-### Basic Tag
-
-Every tag consists of 3 parts, which are all declared i the `.tag` file.
-
-#### **tag name**
-
-The **tag name** is used for the tag registration and usage later in the application. The tag name must be unique.
-
-For example if we have the site navigation moved in its own tag, we can name the tag `navigation`.
-
-The tag name is declared in the first opening and last closing tags in the `.tag` file
 
 ```html
-<navigation>
-  ...
-</navigation>
+<!-- index.html -->
+<html>
+  <body>
+    <my-app></my-app>
+    <script src='dist/bundle.js'></script>
+  </body>
+</html>
+
+<!-- my-app.tag -->
+<my-app>
+  <h1>Welcome!</h1>
+</my-app>
 ```
 
-#### **script (optional)**
-
-  The script contains the tag's logic. It must be wrapped in `<script>` tags. The tag object is accessed via the `tag` variable.
-
-```html
-...
-<script>
-  tag.links = {
-    home: '#home',
-    about: '#about'
-  }
-</script>
-...
-```
-
-#### **template**
-
-The template part contains all the DOM elements. It describes the layout of the tag. Organic-oval uses [JSX]() to describe its layout. You have the `tag` variable available in the template, too.
-
-```html
-...
-<ul class="navigation">
-  <li><a href={tag.links.home}>Home</a></li>
-  <li><a href={tag.links.about}>About</a></li>
-</ul>
-...
-```
-
-#### Basic Tag Example
-
-here is how the whole `navigation.tag` looks like
+## DSL
 
 ```html
 <navigation>
   <script>
-    tag.links = {
+    this.links = {
       home: '#home',
       about: '#about'
     }
   </script>
   <ul class="navigation">
-    <li><a href={tag.links.home}>Home</a></li>
-    <li><a href={tag.links.about}>About</a></li>
+    <li><a href=${this.links.home}>Home</a></li>
+    <li><a href=${this.links.about}>About</a></li>
   </ul>
 </navigation>
 ```
 
-### Nested Tags
+* The tag name **must be unique**.
+* The script is *optional* and contains the **component's constructor logic**.
 
-#### Requiring a nested tag
-
-In order to use a tag within a tag, you must require it in the `<script></script>`. There is no need to assign it to a variable. What the require does is to register the nested tag to `oval`.
-
-```html
-<navigation>
-  <script>
-    require('./navigation-item')
-    ...
-  </script>
-  ...
-</navigation>
-```
-
-#### Using a nested tag
-
-After requiring it, the nested tag can be used as any other tag in the parent's template.
+### Nesting
 
 ```html
+<!-- ./navigation.tag -->
 <navigation>
   <script>
     require('./navigation-item')
@@ -231,72 +97,52 @@ After requiring it, the nested tag can be used as any other tag in the parent's 
 </navigation>
 ```
 
-### Passing props to a tag
-
-#### As an attribute
-
-Setting an attribute to nested component is just like setting an attribute to a DOM element.
+### Passing props and attributes to a component
 
 ```html
+<!-- ./navigation.tag -->
 <navigation>
   <script>
     require('./navigation-item')
-    ...
+    this.obj = {}
+    this.handler = function (e) {
+      console.log(e) // details: 'response'
+    }
   </script>
   ...
-  <navigation-item class="item" data-value='42' ...>...</navigation-item>
-  ...
-</navigation>
-
-<navigation-item>
-  <script>
-    console.log(tag.attributes.class) // item
-  </script>
-  <div {...tag.attributes}></div>
-</navigation-item>
-```
-
-#### By reference as property
-
-Passing a property by reference makes it available as `tag.props.link` in the nested tag's logic.
-
-```html
-<navigation>
-  <script>
-    require('./navigation-item')
-    tag.myVariable = {title: 'Home', href: '#home'}
-    ...
-  </script>
-  ...
-  <navigation-item prop-link={tag.myVariable}...>
-    ...
-  </navigation-item>
+  <navigation-item d-value="item" obj=${this.obj} eventName=${this.handler} />
   ...
 </navigation>
 
+<!-- ./navigation-item.tag -->
 <navigation-item>
   <script>
-    console.log(tag.props.link) // {title: 'Home', href: '#home'}
+    console.log(this.getAttribute('d-value')) // item
+    console.log(this.obj) // {}
+    this.emit('eventName', 'response') // will trigger any event's handlers
   </script>
+  <div></div>
 </navigation-item>
 ```
 
 ### Render inner content
 
 ```html
+<!-- ./my-container.tag -->
 <my-container>
   <h1> Container with dynamic children: </h1>
   <hr />
-  {tag.innerChildren}
+  <slot name='inner' />
   <hr />
 </my-container>
 
+<!-- ./app.tag -->
 <app>
   <my-container>
-    <h2>inner content 1</h2>
+    <h2 slot='inner'>inner content 1</h2>
   </my-container>
   <my-container>
-    <my-custom-tag>inner content 2</my-custom-tag>
+    <my-custom-tag slot='inner'>inner content 2</my-custom-tag>
   </my-container>
 </app>
 ```
@@ -308,9 +154,9 @@ Passing a property by reference makes it available as `tag.props.link` in the ne
 ```html
 <navigation>
   <script>
-    tag.show = false
+    this.show = false
   </script>
-  <h1 if={tag.show}>
+  <h1 if=${this.show}>
     H1 Text
   </h1>
 </navigation>
@@ -321,19 +167,38 @@ Passing a property by reference makes it available as `tag.props.link` in the ne
 ```html
 <navigation>
   <script>
-    tag.items = [1, 2, 3]
+    this.items = [1, 2, 3]
   </script>
   <ul>
-    <each itemValue, itemIndex in {tag.items}>
+    <each itemValue, itemIndex in {this.items}>
       <li>{itemIndex} - {itemValue}</li>
     </each>
   </ul>
 </navigation>
 ```
 
+### Lifecycle events
+
+1. `mount` - only once on mount
+1. `update` - every time when tag is updated (respectively on first mount too)
+1. `updated` - every time after tag is updated and rendered to dom
+1. `mounted` - only once tag is mounted and updated into dom
+1. `unmounted` - when tag is removed from dom
+
+### freeze dom elements
+
+The `div` wont be re-rendered when `my-tag` updates leaving a space for integration
+with other libraries working with dom
+
+```
+<my-tag>
+  <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
+</my-tag>
+```
+
 ### control re-rendering of tags
 
-The following tag won't re-render itself and will not be replaced by parent tag updates as long as it is instantiated and part of the dom. This is particulary useful for optimizations, see [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
+The following tag won't re-render itself and will not be replaced by parent tag updates as long as it is instantiated and part of the dom.
 
 ```html
 <my-tag>
@@ -345,113 +210,55 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
-### Tag directives
+## HowTo
 
-`organic-oval` gives you the functionality to extend the `createElement` function. You can write your directive and inject it in the components that will use it.
-
-A directive is the following module:
+### define components at runtime
 
 ```js
-module.exports = function (tag, directiveName) {
-  return {
-    preCreate: function (createElement, tagName, props, ...children) {
-      // ... augment props
-      var directiveValue = props[directiveName]
-      // optionally return new array of children instead of given ones using createElement Fn
-      // example: return [createElement('div'), createElement('my-component')]
-    },
-    postCreate: function (el, directiveValue) {
-      // ... augment `el` dom element
-    },
-    tagName: function (tagName, props) {
-      // return different tagName value
-      var newTagNameValue = props[directiveName]
-      return newTagNameValue
-    }
-  }
-}
+require('organic-oval').define({
+  tagName: 'my-tag',
+  script: function () {},
+  template: function (html) {return html`<div>inner component content</div>`}
+})
 ```
 
-And can be injected into any tag:
-
-```html
-<my-tag>
-  <script>
-    tag.injectDirectives({
-      'directive-name': require('my-directive')
-    })
-  </script>
-  ...
-  <p directive-name>hello directives</p>
-  ...
-</my-tag>
-```
-
-Check out the [**directive example**](https://github.com/camplight/organic-oval-examples/tree/master/tags/directives) to see more.
-
-### References to Dom Elements
-
-```html
-<my-tag>
-  <script>
-    tag.on('updated', () => {
-      console.log(tag.refs.inputName)
-    })
-  </script>
-  <input ref='inputName' />
-</my-tag>
-```
-
-## global augmenting
+### create components at runtime
 
 ```js
-// global-oval.js
-module.exports = function (oval) {
-  var oldBaseTag = oval.BaseTag
-  var myGlobalDirectives = [...]
-  oval.BaseTag = function (tag, rootEl, props, attrs) {
-    oldBaseTag(tag, rootEl, props, attrs)
-    tag.injectDirectives(myGlobalDirectives)
-  }
-}
-
-// main.js
-var oval = require('organic-oval')
-require('global-oval')(oval)
+let el = document.createElement('my-tag')
+require('organic-oval').upgrade(el)
 ```
 
-### Lifecycle events
+## API
 
-1. `mount` - only once on mount
-1. `update` - every time when tag is updated (respectively on first mount too)
-  * use this event to modify `tag.view` which will be used to patch `tag.root`
-1. `updated` - every time after tag is updated
-  * use this event to modify `tag.root`
-1. `mounted` - only once tag is mounted and updated
-1. `unmount` - when tag is going to be removed
-  * use this event to destroy any runtime allocated resources
-1. `unmounted` - when tag is removed
+### oval.html(component)
+The method returns tagged template function, see [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
 
-### freeze dom elements
+The tagged template function (scoped to the component) `component.html` then is used by 
+`component.template()` implementations to render component's representation accordingly to
+its state.
 
-```
-<my-tag>
-  <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
-</my-tag>
-```
+### oval.render(component)
+The method returns render function (scoped to the component) which patches
+components representation to match the one accordingly to `component.template()`
+
+### oval.define(options)
+The method defines a component accordingly to its options:
+
+* `tagName`: String
+* `tagLine`: String
+* `script()`: Function
+* `template(html)`: Function
+
+:warning: Note that this method also upgrades all matched document elements by `tagName`
+
+### oval.upgrade(el)
+The method upgrades given NodeElement `el` accordingly to previously defined 
+component
 
 ## Known Issues
 
 1. multiline element declaration with `if` attribute will work only when if statement is on the first line
-
-  **Won't** work:
-
-  ```html
-  <h1 class='test'
-    if={condition}>
-    Some Text
-  </h1>
-  ```
 
   *Will* work:
 
@@ -464,14 +271,6 @@ require('global-oval')(oval)
 
 2. each loops should have `cid` on every looped item so that incremental-dom can properly update them on changes
 
-  **Won't** work with dynamic `items`:
-
-  ```html
-  <each item in {items}>
-    <div>{item}</div>
-  </each>
-  ```
-
   *Will* work:
 
   ```html
@@ -481,13 +280,6 @@ require('global-oval')(oval)
   ```
 
 3. conditional rendered sibling tags with same name should have `cid` so that incremental-dom can properly update them on changes
-
-  **Won't** work with conditional tags:
-
-  ```html
-  <div if={condition1}>...</div>
-  <div if={condition2}>...</div>
-  ```
 
   *Will* work:
 

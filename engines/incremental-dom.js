@@ -12,69 +12,31 @@ IncrementalDOM.notifications.nodesDeleted = function (node) {
   }
 }
 
+module.exports.upgrade = function (el) {
+  components[el.tagName.toLowerCase()](el)
+  el.connectedCallback()
+}
+
 module.exports.define = function (options) {
   if (components[options.tagName]) throw new Error('oval component "' + options.tagName + '" already defined')
   components[options.tagName] = function (el) {
+    if (el.render) throw new Error('element ' + el.tagName + ' already adopted')
+    require('../lib/custom-element')(el)
     Object.assign(el, {
-      mounted: false,
       html: module.exports.html(el),
       render: module.exports.render(el),
-      state: {}, // populated during rendering
-      parentComponent: null, // populated during rendering
+      kids: {}, // populated during rendering
       template: function () {
         return options.template.call(this, this.html)
-      },
-      update: function () {
-        this.emit('update')
-        this.render()
-        this.emit('updated')
-      },
-      shouldUpdate: function (newState) {
-        Object.assign(this.state, newState)
-        this.update()
-      },
-      connectedCallback: function () {
-        this.emit('mount')
-        this.update()
-        this.mounted = true
-        this.emit('mounted')
-      },
-      attributeChangedCallback: function () {
-        this.update()
-      },
-      propertyChangedCallback: function () {
-        this.update()
-      },
-      adoptedCallback: function () {
-        // TODO?
-      },
-      disconnectedCallback: function () {
-        this.emit('unmount')
-        // TODO? 
-        this.emit('unmounted')
-      },
-      on: function (eventName, eventHandler) {
-        this.addEventListener(eventName, eventHandler)
-      },
-      off: function (eventName, eventHandler) {
-        this.removeEventListener(eventName, eventHandler)
-      },
-      emit: function (eventName, eventData) {
-        let e = new CustomEvent(eventName, {
-          detail: eventData,
-          bubbles: false
-        })
-        this.dispatchEvent(e)
       }
     })
     options.script.bind(el)()
   }
 
   let existingElements = document.body.querySelectorAll(options.tagName)
-  existingElements.forEach( (el) => {
-    components[options.tagName](el)
-    el.connectedCallback()
-  })
+  existingElements.forEach(module.exports.upgrade)
+
+  return components[options.tagName]
 }
 
 module.exports.render = function (component) {
@@ -93,35 +55,51 @@ module.exports.render = function (component) {
 module.exports.html = function (component) {
   return hyperx((tagName, props, kids) => {
     return function () {
+      kids = cleanUpKids(kids)
       var parsedAttrs = parseAttrsObj(props)
       if (tagName === 'virtual') return appendChilds(kids)
+      if (tagName === 'slot') {
+        return appendChilds(component.kids[props.name])
+      }
+      if (tagName === 'template' && props.slot) {
+        IncrementalDOM.currentComponent.kids[props.slot] = kids
+        return
+      }
       IncrementalDOM.elementOpenStart(tagName, parsedAttrs.key)
       for (var key in parsedAttrs.attrs) {
         IncrementalDOM.attr(key, parsedAttrs.attrs[key])
       }
       let createdElement = IncrementalDOM.elementOpenEnd()
+      if (parsedAttrs.attrs['freeze']) {
+        IncrementalDOM.skip()
+      }
       if (components[tagName]) {
-        createdElement.kids = cleanUpKids(kids)
+        IncrementalDOM.currentComponent = createdElement
         if (!createdElement.mounted) {
-          createdElement.parentComponent = component
           components[tagName](createdElement)
           Object.assign(createdElement.state, parsedAttrs.props)
           for (let name in parsedAttrs.handlers) {
             createdElement.on(name, parsedAttrs.handlers[name])
           }
+          appendChilds(kids)
           createdElement.connectedCallback()
         } else {
+          appendChilds(kids)
           createdElement.shouldUpdate(parsedAttrs.props)
         }
       } else {
-        appendChilds(kids)
+        let hasNotRenderedChildren = createdElement && createdElement.children.length === 0 && kids.length !== 0
+        if (hasNotRenderedChildren || !parsedAttrs.attrs['freeze']) {
+          appendChilds(kids)
+        }
       }
       IncrementalDOM.elementClose(tagName)
+      IncrementalDOM.currentComponent = null
     }
   })
 }
 
-const appendChilds = function (childs, parent) {
+const appendChilds = function (childs) {
   if (!childs) return
   for (var i = 0; i < childs.length; i++) {
     var node = childs[i]
@@ -141,7 +119,7 @@ const appendChilds = function (childs, parent) {
     if (typeof node === 'function') {
       node()
     } else {
-      console.warn('found unknown node', node, tagName, props, children)
+      console.warn('found unknown node', node)
     }
   }
 }
@@ -157,11 +135,11 @@ const parseAttrsObj = function (attrsObj) {
     for (var i = 0; i < attrsObjKeys.length; i++) {
       var key = attrsObjKeys[i]
       var val = attrsObj[key]
-      
+
       if (key === 'className') {
         key = 'class'
       }
-      
+
       if (typeof val === 'object') {
         props[key] = val
         continue
@@ -180,7 +158,6 @@ const parseAttrsObj = function (attrsObj) {
     handlers: handlers
   }
 }
-
 
 const cleanUpKids = function (kids) {
   if (!kids) return
