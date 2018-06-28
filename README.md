@@ -104,13 +104,14 @@ require('./components/my-app.tag')
 <navigation>
   <script>
     require('./navigation-item')
+    this.itemValue = 'item'
     this.obj = {}
     this.handler = function (e) {
       console.log(e) // details: 'response'
     }
   </script>
   ...
-  <navigation-item d-value="item" obj=${this.obj} eventName=${this.handler} />
+  <navigation-item d-value=${this.itemValue} obj=${this.obj} eventName=${this.handler} />
   ...
 </navigation>
 
@@ -170,8 +171,8 @@ require('./components/my-app.tag')
     this.items = [1, 2, 3]
   </script>
   <ul>
-    <each itemValue, itemIndex in {this.items}>
-      <li>{itemIndex} - {itemValue}</li>
+    <each itemValue, itemIndex in ${this.items}>
+      <li>${itemIndex} - ${itemValue}</li>
     </each>
   </ul>
 </navigation>
@@ -256,34 +257,23 @@ The method defines a component accordingly to its options:
 The method upgrades given NodeElement `el` accordingly to previously defined 
 component
 
-## Known Issues
+## Known Compiler Issues
 
-1. multiline element declaration with `if` attribute will work only when if statement is on the first line
+1. element declaration with `if` attribute will work only when if statement is on the first line
 
-  *Will* work:
+  *will NOT* work:
 
   ```html
-  <h1 if={condition}
-    class='test'>
+  <h1 class='test'
+    if=${condition}>
     Some Text
   </h1>
   ```
 
-2. each loops should have `cid` on every looped item so that incremental-dom can properly update them on changes
+2. each loops will work only when looped node is declared on the next line
 
-  *Will* work:
-
+  *will NOT* work:
+  
   ```html
-  <each item, index in {items}>
-    <div cid={index}>{item}</div>
-  </each>
-  ```
-
-3. conditional rendered sibling tags with same name should have `cid` so that incremental-dom can properly update them on changes
-
-  *Will* work:
-
-  ```html
-  <div if={condition1} cid='value1'>...</div>
-  <div if={condition2} cid='value2'>...</div>
+  <each model in ${items}><looped-content>${model}</looped-content></each>
   ```

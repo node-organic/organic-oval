@@ -23,10 +23,20 @@ var extractAttributes = function (condition, line) {
   return line.replace('if=${' + condition + '}', '')
 }
 var parseIfs = function (lines) {
+  // variable holding amount of `if` statements encountered during parsing
+  // used to construct `oid` value
+  let ifcount = -1
+
+  // iterate over all lines searching for if statements
   for (var i = 0; i < lines.length; i++) {
     if (lines[i].indexOf('if=') !== -1) {
-      // handle multiline if statement
+      ifcount += 1
       lines[i] = lines[i].trim()
+
+      // test transform multiline if statement such as
+      // <p if=${}
+      //    class="">...
+      // into singleline <p if=${} class="">...
       var closingArrowIndex = lines[i].lastIndexOf('>')
       if (closingArrowIndex !== lines[i].length - 1) {
         var lineBuffer = []
@@ -83,39 +93,68 @@ var parseIfs = function (lines) {
           lines.splice(k, 1)
           k -= 1
         }
-        parseIfs(buffer)
-        lines[i] = '${' + statement + ' ? this.html\`<' + nodeName + ' ' + attributes + '>' + buffer.join('\n') + '</' + nodeName + '>\` : null}'
+        // re-construct attributes with oid marker included
+        attributes = 'oid="${this.oid}-if' + ifcount + '" ' + attributes
+        // rewrite opening tag with if statement
+        lines[i] = '${' + statement + ' ? this.html`<' + nodeName + ' ' + attributes + '>'
+        // insert any buffered content at next line of `i + k`
+        for (let k = 0; k < buffer.length; k++) {
+          lines.splice(i + k + 1, 0, buffer[k])
+        }
+        // insert closing tag
+        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '>` : null}')
       } else {
-        var lineWithoutStatement = lines[i].replace('if={' + statement + '}', '')
-        lines[i] = '${' + statement + ' ? this.html\`' + lineWithoutStatement + '\` : null}'
+        // single line if statement such as `<p if=${statement}>text</p>``
+
+        // get clean tag
+        var lineWithoutStatement = lines[i].replace('if=${' + statement + '}', '')
+
+        // re-construct attributes with oid marker
+        let parts = lineWithoutStatement.trim().split(' ')
+        parts.splice(1, 0, 'oid="${this.oid}-if' + ifcount + '"')
+        lineWithoutStatement = parts.join(' ')
+
+        // rewrite the line
+        lines[i] = '${' + statement + ' ? this.html`' + lineWithoutStatement + '` : null}'
       }
     }
   }
-  return lines
 }
 
 var parseLoops = function (lines) {
-  var content = lines.join('\n')
-
-  // parse all each opening tags
-  // takes every - <each %params% in ${%model%}>
-  // makes it into - ${ %model%.map((%params%) => (`
-  var openingEachRegex = new RegExp(/<each [^>]*>/mig)
-  content = content.replace(openingEachRegex, function (openingTag) {
-    openingTag = openingTag.slice('<each'.length, -1)
-    var params = openingTag.split(' in ')[0].trim()
-    var model = openingTag.split(' in ')[1].trim().slice('{'.length, -1) // get the model, removing ${ and }
-    return `\${ ${model}.map((${params}) => this.html\``
-  })
-
-  // parse all each closing tags
-  content = content.replace(new RegExp(/<\/each>/mig), '\`)}')
-  return content.split('\n')
+  let mapcount = -1
+  let shouldSetOID = null
+  for (var i = 0; i < lines.length; i++) {
+    if (shouldSetOID) {
+      let parts = lines[i].trim().split('>')
+      parts[0] += ' oid="${this.oid}-map' + mapcount + '-${' + shouldSetOID + '}"'
+      lines[i] = parts.join('>')
+      shouldSetOID = null
+    }
+    if (lines[i].indexOf('<each ') !== -1) {
+      mapcount += 1
+      let openingTag = lines[i].trim().slice('<each'.length, -1)
+      let params = openingTag.split(' in ')[0].trim()
+      let indexVariableName = 'index'
+      if (params.indexOf(',') !== -1) {
+        indexVariableName = params.split(',')[1].trim()
+      } else {
+        params += ', ' + indexVariableName
+      }
+      let model = openingTag.split(' in ')[1].trim().slice('${'.length, -1) // get the model, removing ${ and }
+      lines[i] = `\${ ${model}.map((${params}) => { this.html\``
+      shouldSetOID = indexVariableName
+    }
+    if (lines[i].indexOf('</each>') !== -1) {
+      lines[i] = lines[i].replace('</each>', '`})}')
+      shouldSetOID = null
+    }
+  }
 }
 
 module.exports.compile = function (content) {
   var lines = content.split('\n')
   parseIfs(lines)
-  lines = parseLoops(lines)
+  parseLoops(lines)
   return lines.join('\n')
 }

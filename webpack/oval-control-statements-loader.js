@@ -1,4 +1,4 @@
-var TagCompiler = require('../lib/compilers/tag-control-statements')
+var TagCompiler = require('../compilers/tag-control-statements')
 
 module.exports = function (source) {
   var content = source

@@ -3,6 +3,7 @@ const hyperx = require('hyperx')
 
 const components = {}
 let INCREMENTAL_RENDERING = false
+let OID = 0
 
 IncrementalDOM.notifications.nodesDeleted = function (node) {
   if (!node.tagName) return
@@ -20,17 +21,18 @@ module.exports.upgrade = function (el) {
 module.exports.define = function (options) {
   if (components[options.tagName]) throw new Error('oval component "' + options.tagName + '" already defined')
   components[options.tagName] = function (el) {
-    if (el.render) throw new Error('element ' + el.tagName + ' already adopted')
+    if (el.oid) throw new Error('element ' + el.tagName + ' already adopted with oid ' + el.oid)
     require('../lib/custom-element')(el)
     Object.assign(el, {
+      oid: OID++,
       html: module.exports.html(el),
       render: module.exports.render(el),
       kids: {}, // populated during rendering
       template: function () {
-        return options.template.call(this, this.html)
+        return options.template.call(this)
       }
     })
-    options.script.bind(el)()
+    options.script.call(el)
   }
 
   let existingElements = document.body.querySelectorAll(options.tagName)
@@ -65,7 +67,7 @@ module.exports.html = function (component) {
         IncrementalDOM.currentComponent.kids[props.slot] = kids
         return
       }
-      IncrementalDOM.elementOpenStart(tagName, parsedAttrs.key)
+      IncrementalDOM.elementOpenStart(tagName, parsedAttrs.oid)
       for (var key in parsedAttrs.attrs) {
         IncrementalDOM.attr(key, parsedAttrs.attrs[key])
       }

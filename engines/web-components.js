@@ -1,3 +1,5 @@
+let OID = 0
+
 module.exports.upgrade = function (el) {
   throw new Error('not supported')
 }
@@ -19,13 +21,14 @@ module.exports.define = function (options) {
     }
     constructor () {
       super()
+      this.oid = OID++
       require('../lib/custom-element')(this)
       this.html = module.exports.html(this)
       this.render = module.exports.render(this)
-      options.script.bind(this)()
+      options.script.call(this)
     }
     template () {
-      return options.template.call(this, this.html)
+      return options.template.call(this)
     }
     attributeChangedCallback () {
       this.update()
