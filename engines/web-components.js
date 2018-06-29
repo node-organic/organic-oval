@@ -40,4 +40,5 @@ module.exports.define = function (options) {
     }
   }
   customElements.define(options.tagName, Class)
+  return Class
 }

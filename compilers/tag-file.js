@@ -38,7 +38,7 @@ module.exports.compile = function (content) {
   var scriptContent = extractScript(lines)
   var tagInfo = extractTagInfo(lines)
   var htmlContent = lines.join('\n')
-  var result = `return require('organic-oval').define({
+  var result = `module.exports = require('organic-oval').define({
     tagName: "${tagInfo.tagName}",
     tagLine: "${tagInfo.tagLine}",
     script: function () { ${scriptContent.trim()} },

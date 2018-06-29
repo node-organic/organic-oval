@@ -8,7 +8,7 @@ test('tag-file', function () {
 </tag-name>
 `
 
-  var expectedCompiledCode = `return require('organic-oval').define({
+  var expectedCompiledCode = `module.exports = require('organic-oval').define({
   tagName: "tag-name",
   tagLine: "",
   script: function () {
