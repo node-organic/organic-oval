@@ -25,7 +25,7 @@ test('compiles both if and each separately', function () {
       }
       \${
         items.map((item, index) => {
-          this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
+          return this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
         })
       }
     </tag-name>
@@ -56,7 +56,7 @@ test('compiles if with inner each', function () {
             html test
             \${
               items.map((item, index) => {
-                this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
+                return this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
               })
             }
           </h1>
@@ -87,7 +87,7 @@ test('compiles each with inner if', function () {
   var expectedCompiledCode = `
     <tag-name>
       \${
-        items.map((item, index) => { this.html\`
+        items.map((item, index) => { return this.html\`
           <div oid="\${this.oid}-map0-\${index}">
             <h2>\${item}</h2>
             \${

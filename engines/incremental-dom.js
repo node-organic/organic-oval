@@ -73,7 +73,7 @@ module.exports.html = function (component) {
         IncrementalDOM.currentComponent.kids[props.slot] = kids
         return
       }
-      IncrementalDOM.elementOpenStart(tagName, parsedAttrs.oid)
+      IncrementalDOM.elementOpenStart(tagName.toLowerCase(), parsedAttrs.oid)
       for (var key in parsedAttrs.attrs) {
         IncrementalDOM.attr(key, parsedAttrs.attrs[key])
       }
@@ -96,12 +96,12 @@ module.exports.html = function (component) {
           createdElement.shouldUpdate(parsedAttrs.props)
         }
       } else {
-        let hasNotRenderedChildren = createdElement && createdElement.children.length === 0 && kids.length !== 0
+        let hasNotRenderedChildren = kids && createdElement && createdElement.children.length === 0 && kids.length !== 0
         if (hasNotRenderedChildren || !parsedAttrs.attrs['freeze']) {
           appendChilds(kids)
         }
       }
-      IncrementalDOM.elementClose(tagName)
+      IncrementalDOM.elementClose(tagName.toLowerCase())
       IncrementalDOM.currentComponent = null
     }
   })

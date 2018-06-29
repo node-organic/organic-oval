@@ -13,7 +13,7 @@ test('compiles', function () {
     <tag-name>
       \${
         items.map((item, index) => {
-          this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
+          return this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
         })
       }
     </tag-name>
@@ -39,12 +39,12 @@ test('compiles multiple each statements', function () {
     <tag-name>
       \${
         items.map((item, index) => {
-          this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
+          return this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>\`
         })
       }
       \${
         items.map((item, index) => {
-          this.html\`<h2 oid="\${this.oid}-map1-\${index}">\${item}</h2>\`
+          return this.html\`<h2 oid="\${this.oid}-map1-\${index}">\${item}</h2>\`
         })
       }
     </tag-name>
@@ -70,10 +70,10 @@ test('compiles multiple nested each statements', function () {
     <tag-name>
       \${
         items.map((item, index) => {
-          this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>
+          return this.html\`<h2 oid="\${this.oid}-map0-\${index}">\${item}</h2>
           \${
             items.map((item, index) => {
-              this.html\`<h1 oid="\${this.oid}-map1-\${index}">\${item}</h1>\`
+              return this.html\`<h1 oid="\${this.oid}-map1-\${index}">\${item}</h1>\`
             })
           }\`
         })

@@ -142,7 +142,7 @@ var parseLoops = function (lines) {
         params += ', ' + indexVariableName
       }
       let model = openingTag.split(' in ')[1].trim().slice('${'.length, -1) // get the model, removing ${ and }
-      lines[i] = `\${ ${model}.map((${params}) => { this.html\``
+      lines[i] = `\${ ${model}.map((${params}) => { return this.html\``
       shouldSetOID = indexVariableName
     }
     if (lines[i].indexOf('</each>') !== -1) {
