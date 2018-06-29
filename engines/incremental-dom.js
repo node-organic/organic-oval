@@ -7,18 +7,21 @@ let OID = 0
 
 IncrementalDOM.notifications.nodesDeleted = function (node) {
   if (!node.tagName) return
-  let tagName = node.tagName.toLowerCase()
+  let tagName = node.tagName.toUpperCase()
   if (components[tagName]) {
     node.disconnectedCallback()
   }
 }
 
 module.exports.upgrade = function (el) {
-  components[el.tagName.toLowerCase()](el)
+  if (!components[el.tagName.toUpperCase()]) throw new Error('oval component ' + el.tagName.toUpperCase() + ' not found')
+  components[el.tagName.toUpperCase()](el)
   el.connectedCallback()
 }
 
 module.exports.define = function (options) {
+  if (!options.tagName) throw new Error('options.tagName required')
+  options.tagName = options.tagName.toUpperCase()
   if (components[options.tagName]) throw new Error('oval component "' + options.tagName + '" already defined')
   components[options.tagName] = function (el) {
     if (el.oid) throw new Error('element ' + el.tagName + ' already adopted with oid ' + el.oid)
@@ -32,7 +35,9 @@ module.exports.define = function (options) {
         return options.template.call(this)
       }
     })
-    options.script.call(el)
+    if (options.script) {
+      options.script.call(el)
+    }
   }
 
   let existingElements = document.body.querySelectorAll(options.tagName)
@@ -57,13 +62,14 @@ module.exports.render = function (component) {
 module.exports.html = function (component) {
   return hyperx((tagName, props, kids) => {
     return function () {
+      tagName = tagName.toUpperCase()
       kids = cleanUpKids(kids)
       var parsedAttrs = parseAttrsObj(props)
-      if (tagName === 'virtual') return appendChilds(kids)
-      if (tagName === 'slot') {
+      if (tagName === 'VIRTUAL') return appendChilds(kids)
+      if (tagName === 'SLOT') {
         return appendChilds(component.kids[props.name])
       }
-      if (tagName === 'template' && props.slot) {
+      if (tagName === 'TEMPLATE' && props.slot) {
         IncrementalDOM.currentComponent.kids[props.slot] = kids
         return
       }

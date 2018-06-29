@@ -25,7 +25,9 @@ module.exports.define = function (options) {
       require('../lib/custom-element')(this)
       this.html = module.exports.html(this)
       this.render = module.exports.render(this)
-      options.script.call(this)
+      if (options.script) {
+        options.script.call(this)
+      }
     }
     template () {
       return options.template.call(this)

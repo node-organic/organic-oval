@@ -1,11 +1,11 @@
-# organic-oval
+# organic-oval v5
 
 organic front-end components as custom HTML tags
 
 **Check out** 
 
-* [organic-oval-examples](https://github.com/camplight/organic-oval-examples)
-* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
+* [organic-oval-examples based on organic-oval v4](https://github.com/camplight/organic-oval-examples)
+* [organic-oval-benchmarks based on organic-oval v4](https://github.com/camplight/organic-oval-benchmarks)
 
 ### quick start
 
@@ -119,7 +119,7 @@ require('./components/my-app.tag')
 <navigation-item>
   <script>
     console.log(this.getAttribute('d-value')) // item
-    console.log(this.obj) // {}
+    console.log(this.state.obj) // {}
     this.emit('eventName', 'response') // will trigger any event's handlers
   </script>
   <div></div>
@@ -211,6 +211,34 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
+### virtual nodes
+
+```html
+<my-tag>
+  <virtual>
+    <span>Hello</span>
+  </virtual>
+</my-tag>
+```
+
+renders as
+
+```html
+<my-tag>
+  <span>Hello</span>
+</my-tag>
+```
+
+### oid attribute
+
+Oval automatically assigns oid attributes during compilation of `.tag` files for:
+
+* nodes having `if=${}` statements
+* iterated nodes within `<each></each>` loop
+
+:warning: This attribute has a special meaning for rendering engines to be able to execute
+properly dom diff & re-render algorithms especially in cases with similar dom node shapes siblings to each other.
+
 ## HowTo
 
 ### define components at runtime
@@ -251,15 +279,17 @@ The method defines a component accordingly to its options:
 * `script()`: Function
 * `template(html)`: Function
 
-:warning: Note that this method also upgrades all matched document elements by `tagName`
+:warning: Note that this method also upgrades all matched document.body elements by `tagName`
 
 ### oval.upgrade(el)
+
 The method upgrades given NodeElement `el` accordingly to previously defined 
-component
+component with matching `el.tagName`
 
 ## Known Compiler Issues
 
-1. element declaration with `if` attribute will work only when if statement is on the first line
+1. element declaration with `if` attribute will work only when if statement is 
+on the first line
 
   *will NOT* work:
 
