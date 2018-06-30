@@ -97,7 +97,12 @@ require('./components/my-app.tag')
 </navigation>
 ```
 
-### Passing props and attributes to a component
+### Props, attributes and handlers
+
+* :warning: any attributes with values of `Object` or `Array` will be assigned to:
+  * oval component within its `component.state` namespace
+  * other dom elements directly as a property
+* :warning: any attributes with values of `Function` will be added as Event Listeners respectively.
 
 ```html
 <!-- ./navigation.tag -->
@@ -107,11 +112,15 @@ require('./components/my-app.tag')
     this.itemValue = 'item'
     this.obj = {}
     this.handler = function (e) {
-      console.log(e) // details: 'response'
+      console.log(e) // {details: 'response'}
     }
+    this.clickHandler = function (e) {}
   </script>
   ...
-  <navigation-item d-value=${this.itemValue} obj=${this.obj} eventName=${this.handler} />
+  <navigation-item d-value=${this.itemValue} 
+    obj=${this.obj} 
+    eventName=${this.handler} 
+    click=${this.clickHandler} />
   ...
 </navigation>
 
@@ -120,9 +129,11 @@ require('./components/my-app.tag')
   <script>
     console.log(this.getAttribute('d-value')) // item
     console.log(this.state.obj) // {}
-    this.emit('eventName', 'response') // will trigger any event's handlers
+    this.clickHandler = function (e) {
+      this.emit('eventName', 'response') // will trigger any event's handlers
+    }
   </script>
-  <div></div>
+  <div click=${this.clickHandler}></div>
 </navigation-item>
 ```
 
