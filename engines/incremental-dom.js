@@ -83,8 +83,16 @@ module.exports.html = function (component) {
         return
       }
       IncrementalDOM.elementOpenStart(tagName.toLowerCase(), parsedAttrs.oid)
-      for (var key in parsedAttrs.attrs) {
+      for (let key in parsedAttrs.attrs) {
         IncrementalDOM.attr(key, parsedAttrs.attrs[key])
+      }
+      if (!components[tagName]) {
+        for (let key in parsedAttrs.props) {
+          IncrementalDOM.attr(key, parsedAttrs.props[key])
+        }
+        for (let key in parsedAttrs.handlers) {
+          IncrementalDOM.attr('on' + key, parsedAttrs.handlers[key])
+        }
       }
       let createdElement = IncrementalDOM.elementOpenEnd()
       if (parsedAttrs.attrs['freeze']) {
