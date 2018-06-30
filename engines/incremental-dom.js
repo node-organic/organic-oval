@@ -66,11 +66,20 @@ module.exports.html = function (component) {
       kids = cleanUpKids(kids)
       var parsedAttrs = parseAttrsObj(props)
       if (tagName === 'VIRTUAL') return appendChilds(kids)
-      if (tagName === 'SLOT') {
-        return appendChilds(component.kids[props.name])
+      if (tagName === 'SLOT' && component.kids[props.name]) {
+        let slot = component.kids[props.name]
+        tagName = slot.tagName
+        props = slot.props
+        kids = slot.kids
       }
-      if (tagName === 'TEMPLATE' && props.slot) {
-        IncrementalDOM.currentComponent.kids[props.slot] = kids
+      if (props.slot) {
+        let cleanprops = {...props}
+        delete cleanprops.slot
+        IncrementalDOM.currentComponent.kids[props.slot] = {
+          props: cleanprops,
+          kids: kids,
+          tagName: tagName
+        }
         return
       }
       IncrementalDOM.elementOpenStart(tagName.toLowerCase(), parsedAttrs.oid)
