@@ -49,6 +49,7 @@ module.exports.define = function (options) {
 module.exports.render = function (component) {
   return function () {
     let templateBuilderFn = component.template()
+    if (!templateBuilderFn) return
     if (INCREMENTAL_RENDERING) {
       templateBuilderFn()
     } else {
@@ -97,6 +98,13 @@ module.exports.html = function (component) {
       let createdElement = IncrementalDOM.elementOpenEnd()
       if (parsedAttrs.attrs['freeze']) {
         IncrementalDOM.skip()
+        IncrementalDOM.elementClose(tagName.toLowerCase())
+        return
+      }
+      if (createdElement.shouldRender === false) {
+        IncrementalDOM.skip()
+        IncrementalDOM.elementClose(tagName.toLowerCase())
+        return
       }
       if (components[tagName]) {
         IncrementalDOM.currentComponent = createdElement
