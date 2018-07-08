@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * `compilers/tag-file` - delegates all js specific component definition to *the runtime*
 * `index.js` - represents an singleton commonjs module aka *the runtime*
 * `directives` are removed
+* `BaseTag` api is refactored as a `lib/custom-element.js` mixin
+* `tag.plasma` is removed and custom elements dispatch custom dom events on themselfs
 
 ## *[4.2.0]* - 2017-03-12
 

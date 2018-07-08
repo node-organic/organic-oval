@@ -1,7 +1,7 @@
 var extractStatement = function (line) {
   // line example: 'class="something" if={statement} id="1"'
   // output: 'statement'
-  var ifMark = 'if=${'
+  var ifMark = 'if={'
   // find index of if mark
   var statementStart = line.indexOf(ifMark)
   // find index of end statement
@@ -20,7 +20,7 @@ var extractStatement = function (line) {
   return statement
 }
 var extractAttributes = function (condition, line) {
-  return line.replace('if=${' + condition + '}', '')
+  return line.replace('if={' + condition + '}', '')
 }
 var parseIfs = function (lines) {
   // variable holding amount of `if` statements encountered during parsing
@@ -94,28 +94,32 @@ var parseIfs = function (lines) {
           k -= 1
         }
         // re-construct attributes with oid marker included
-        attributes = 'oid="${this.oid}-if' + ifcount + '" ' + attributes
+        if (attributes.indexOf('oid=') === -1) {
+          attributes = 'oid={this.oid + "-if' + ifcount + '"} ' + attributes
+        }
         // rewrite opening tag with if statement
-        lines[i] = '${' + statement + ' ? this.html`<' + nodeName + ' ' + attributes + '>'
+        lines[i] = '{' + statement + ' ? <' + nodeName + ' ' + attributes + '>'
         // insert any buffered content at next line of `i + k`
         for (let k = 0; k < buffer.length; k++) {
           lines.splice(i + k + 1, 0, buffer[k])
         }
         // insert closing tag
-        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '>` : null}')
+        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '> : null}')
       } else {
         // single line if statement such as `<p if=${statement}>text</p>``
 
         // get clean tag
-        var lineWithoutStatement = lines[i].replace('if=${' + statement + '}', '')
+        var lineWithoutStatement = lines[i].replace('if={' + statement + '}', '')
 
         // re-construct attributes with oid marker
         let parts = lineWithoutStatement.trim().split(' ')
-        parts.splice(1, 0, 'oid="${this.oid}-if' + ifcount + '"')
+        if (lineWithoutStatement.indexOf('oid') === -1) {
+          parts.splice(1, 0, 'oid={this.oid + "-if' + ifcount + '"}')
+        }
         lineWithoutStatement = parts.join(' ')
 
         // rewrite the line
-        lines[i] = '${' + statement + ' ? this.html`' + lineWithoutStatement + '` : null}'
+        lines[i] = '{' + statement + ' ? ' + lineWithoutStatement + ' : null}'
       }
     }
   }
@@ -126,9 +130,11 @@ var parseLoops = function (lines) {
   let shouldSetOID = null
   for (var i = 0; i < lines.length; i++) {
     if (shouldSetOID) {
-      let parts = lines[i].trim().split('>')
-      parts[0] += ' oid="${this.oid}-map' + mapcount + '-${' + shouldSetOID + '}"'
-      lines[i] = parts.join('>')
+      if (lines[i].indexOf('oid=') === -1) {
+        let parts = lines[i].trim().split('>')
+        parts[0] += ' oid={this.oid + "-map' + mapcount + '-" + ' + shouldSetOID + '}'
+        lines[i] = parts.join('>')
+      }
       shouldSetOID = null
     }
     if (lines[i].indexOf('<each ') !== -1) {
@@ -141,12 +147,12 @@ var parseLoops = function (lines) {
       } else {
         params += ', ' + indexVariableName
       }
-      let model = openingTag.split(' in ')[1].trim().slice('${'.length, -1) // get the model, removing ${ and }
-      lines[i] = `\${ ${model}.map((${params}) => { return this.html\``
+      let model = openingTag.split(' in ')[1].trim().slice('{'.length, -1) // get the model, removing ${ and }
+      lines[i] = `{ ${model}.map((${params}) => (`
       shouldSetOID = indexVariableName
     }
     if (lines[i].indexOf('</each>') !== -1) {
-      lines[i] = lines[i].replace('</each>', '`})}')
+      lines[i] = lines[i].replace('</each>', '))}')
       shouldSetOID = null
     }
   }

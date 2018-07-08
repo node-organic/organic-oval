@@ -16,7 +16,7 @@ organic front-end components as custom HTML tags
 #### add webpack.config.js
 
 ```js
-var webpack = require('webpack')
+const webpack = require('webpack')
 
 module.exports = {
   'resolve': {

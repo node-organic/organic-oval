@@ -14,20 +14,31 @@ oval.define({
   }
 })
 
+oval.define({
+  tagName: 'tag-container',
+  script: function () {},
+  template: function () {
+    return this.html`<tag-should-render />`
+  }
+})
+
 test('shouldRender', function () {
-  var el = document.createElement('tag-should-render')
-  document.body.appendChild(el)
-  oval.upgrade(el)
+  var container = document.createElement('tag-container')
+  document.body.appendChild(container)
+  oval.upgrade(container)
+  let el = container.children[0]
   var target = el.children[0]
   expect(el.shouldRender).toEqual(false)
   var renderValue = el.renderValue
   expect(target.attributes.class.value).toEqual(renderValue)
   el.renderValue = 'changed'
   el.shouldRender = true
-  el.update()
+  container.update()
   expect(el.shouldRender).toEqual(false)
   expect(target.attributes.class.value).toEqual('changed')
   el.renderValue = 'changed2'
-  el.update()
+  container.update()
   expect(target.attributes.class.value).toEqual('changed')
+  el.update()
+  expect(target.attributes.class.value).toEqual('changed2')
 })

@@ -42,7 +42,9 @@ module.exports.compile = function (content) {
     tagName: "${tagInfo.tagName}",
     tagLine: "${tagInfo.tagLine}",
     script: function () { ${scriptContent.trim()} },
-    template: function () { return this.html\`${htmlContent.trim()}\` }
+    template: function (createElement) {
+      return ${htmlContent.trim()}
+    }
   })
 `
   return result

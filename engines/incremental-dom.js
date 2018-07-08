@@ -1,7 +1,13 @@
 const IncrementalDOM = require('incremental-dom')
-const hyperx = require('hyperx')
 
 const components = {}
+const bypassDomEventTrigger = [
+  'mount',
+  'update',
+  'updated',
+  'mounted',
+  'unmounted'
+]
 let INCREMENTAL_RENDERING = false
 let OID = 0
 
@@ -25,14 +31,66 @@ module.exports.define = function (options) {
   if (components[options.tagName]) throw new Error('oval component "' + options.tagName + '" already defined')
   components[options.tagName] = function (el) {
     if (el.oid) throw new Error('element ' + el.tagName + ' already adopted with oid ' + el.oid)
-    require('../lib/custom-element')(el)
     Object.assign(el, {
+      mounted: false,
+      shouldRender: true,
+      props: {},
+      handlers: {}, // internal
       oid: OID++,
-      html: module.exports.html(el),
       render: module.exports.render(el),
+      createElement: module.exports.buildCreateElement(el),
       kids: {}, // populated during rendering
       template: function () {
-        return options.template.call(this)
+        return options.template.call(el, el.createElement)
+      },
+      update: function () {
+        this.emit('update')
+        this.render()
+        this.emit('updated')
+      },
+      shouldUpdate: function (newProps) {
+        Object.assign(this.props, newProps)
+        this.update()
+      },
+      connectedCallback: function () {
+        this.emit('mount')
+        this.update()
+        this.mounted = true
+        this.emit('mounted')
+      },
+      disconnectedCallback: function () {
+        this.emit('unmounted')
+      },
+      on: function (eventName, eventHandler) {
+        if (bypassDomEventTrigger.indexOf(eventName) !== -1) {
+          this.handlers[eventName] = eventHandler
+          return
+        }
+        this.addEventListener(eventName, eventHandler)
+      },
+      off: function (eventName, eventHandler) {
+        if (bypassDomEventTrigger.indexOf(eventName) !== -1) {
+          this.handlers[eventName] = null
+          return
+        }
+        this.removeEventListener(eventName, eventHandler)
+      },
+      emit: function (eventName, eventData) {
+        if (bypassDomEventTrigger.indexOf(eventName) !== -1) {
+          if (this.handlers[eventName]) {
+            this.handlers[eventName]()
+          }
+          return
+        }
+        let e = new CustomEvent(eventName, {
+          detail: eventData,
+          bubbles: false
+        })
+        this.dispatchEvent(e)
+      },
+      unmount: function () {
+        this.parentNode.removeChild(this)
+        this.disconnectedCallback()
       }
     })
     if (options.script) {
@@ -60,11 +118,11 @@ module.exports.render = function (component) {
   }
 }
 
-module.exports.html = function (component) {
-  return hyperx((tagName, props, kids) => {
-    return function () {
+module.exports.buildCreateElement = function (component) {
+  return (tagName, props, ...kids) => {
+    return () => {
       tagName = tagName.toUpperCase()
-      kids = cleanUpKids(kids)
+      props = props || {}
       var parsedAttrs = parseAttrsObj(props)
       if (tagName === 'VIRTUAL') return appendChilds(kids)
       if (tagName === 'SLOT' && component.kids[props.name]) {
@@ -83,7 +141,8 @@ module.exports.html = function (component) {
         }
         return
       }
-      IncrementalDOM.elementOpenStart(tagName.toLowerCase(), parsedAttrs.oid)
+      let key = parsedAttrs.attrs.oid || parsedAttrs.attrs.id || parsedAttrs.attrs.key
+      IncrementalDOM.elementOpenStart(tagName.toLowerCase(), key)
       for (let key in parsedAttrs.attrs) {
         IncrementalDOM.attr(key, parsedAttrs.attrs[key])
       }
@@ -92,7 +151,7 @@ module.exports.html = function (component) {
           IncrementalDOM.attr(key, parsedAttrs.props[key])
         }
         for (let key in parsedAttrs.handlers) {
-          IncrementalDOM.attr('on' + key, parsedAttrs.handlers[key])
+          IncrementalDOM.attr(key, parsedAttrs.handlers[key])
         }
       }
       let createdElement = IncrementalDOM.elementOpenEnd()
@@ -110,7 +169,7 @@ module.exports.html = function (component) {
         IncrementalDOM.currentComponent = createdElement
         if (!createdElement.mounted) {
           components[tagName](createdElement)
-          Object.assign(createdElement.state, parsedAttrs.props)
+          Object.assign(createdElement.props, parsedAttrs.attrs, parsedAttrs.props)
           for (let name in parsedAttrs.handlers) {
             createdElement.on(name, parsedAttrs.handlers[name])
           }
@@ -118,7 +177,7 @@ module.exports.html = function (component) {
           createdElement.connectedCallback()
         } else {
           appendChilds(kids)
-          createdElement.shouldUpdate(parsedAttrs.props)
+          createdElement.shouldUpdate(Object.assign({}, parsedAttrs.attrs, parsedAttrs.props))
         }
       } else {
         let hasNotRenderedChildren = kids && createdElement && createdElement.children.length === 0 && kids.length !== 0
@@ -129,7 +188,7 @@ module.exports.html = function (component) {
       IncrementalDOM.elementClose(tagName.toLowerCase())
       IncrementalDOM.currentComponent = null
     }
-  })
+  }
 }
 
 const appendChilds = function (childs) {
@@ -190,14 +249,4 @@ const parseAttrsObj = function (attrsObj) {
     props: props,
     handlers: handlers
   }
-}
-
-const cleanUpKids = function (kids) {
-  if (!kids) return
-  let result = []
-  for (let i = 0; i < kids.length; i++) {
-    if (kids[i] === '\n') continue
-    result.push(kids[i])
-  }
-  return result
 }
