@@ -1,5 +1,4 @@
-const oval = require('../../../index')
-Object.assign(oval, require('../../../engines/incremental-dom'))
+const oval = require('../index')
 
 oval.define({
   tagName: 'tag-should-render',
@@ -9,16 +8,15 @@ oval.define({
       this.shouldRender = false
     })
   },
-  template: function () {
-    return this.html`<div class=${this.renderValue} />`
+  template: function (h) {
+    return h('div', {'class': this.renderValue})
   }
 })
 
 oval.define({
   tagName: 'tag-container',
-  script: function () {},
-  template: function () {
-    return this.html`<tag-should-render />`
+  template: function (h) {
+    return h('tag-should-render')
   }
 })
 
@@ -28,17 +26,17 @@ test('shouldRender', function () {
   oval.upgrade(container)
   let el = container.children[0]
   var target = el.children[0]
-  expect(el.shouldRender).toEqual(false)
-  var renderValue = el.renderValue
+  expect(el.component.shouldRender).toEqual(false)
+  var renderValue = el.component.renderValue
   expect(target.attributes.class.value).toEqual(renderValue)
-  el.renderValue = 'changed'
-  el.shouldRender = true
-  container.update()
-  expect(el.shouldRender).toEqual(false)
+  el.component.renderValue = 'changed'
+  el.component.shouldRender = true
+  el.component.update()
+  expect(el.component.shouldRender).toEqual(false)
   expect(target.attributes.class.value).toEqual('changed')
-  el.renderValue = 'changed2'
-  container.update()
+  el.component.renderValue = 'changed2'
+  el.component.update()
   expect(target.attributes.class.value).toEqual('changed')
-  el.update()
+  el.component.forceUpdate()
   expect(target.attributes.class.value).toEqual('changed2')
 })

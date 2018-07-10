@@ -4,14 +4,13 @@ organic front-end components as custom HTML tags
 
 **Check out** 
 
-* [organic-oval-examples based on organic-oval v4](https://github.com/camplight/organic-oval-examples)
-* [organic-oval-benchmarks based on organic-oval v4](https://github.com/camplight/organic-oval-benchmarks)
+* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
 
 ### quick start
 
 #### install dependencies
 
-`npm i organic-oval webpack`
+`npm i organic-oval webpack babel-loader babel-plugin-transform-react-jsx`
 
 #### add webpack.config.js
 
@@ -26,6 +25,16 @@ module.exports = {
     'rules': [
       {
         test: /\.tag$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: ['babel-plugin-transform-react-jsx']
+          }
+        }
+      },
+      {
+        test: /\.tag$/,
         exclude: /node_modules/,
         use: [
           {loader: 'organic-oval/webpack/oval-loader'},
@@ -35,7 +44,6 @@ module.exports = {
     ]
   }
 }
-
 ```
 
 ### use
@@ -43,7 +51,7 @@ module.exports = {
 ```js
 // dist/bundle.js
 let oval = require('organic-oval')
-Object.assign(oval, require('organic-oval/engines/incremental-dom'))
+Object.assign(oval, require('organic-oval/engines/preact'))
 require('./components/my-app.tag')
 ```
 
@@ -73,8 +81,8 @@ require('./components/my-app.tag')
     }
   </script>
   <ul class="navigation">
-    <li><a href=${this.links.home}>Home</a></li>
-    <li><a href=${this.links.about}>About</a></li>
+    <li><a href={this.links.home}>Home</a></li>
+    <li><a href={this.links.about}>About</a></li>
   </ul>
 </navigation>
 ```
@@ -99,41 +107,36 @@ require('./components/my-app.tag')
 
 ### Props, attributes and handlers
 
-* :warning: any attributes with values of `Object` or `Array` will be assigned to:
-  * oval component within its `component.state` namespace
-  * other dom elements directly as a property
-* :warning: any attributes with values of `Function` will be added as Event Listeners respectively.
-
 ```html
 <!-- ./navigation.tag -->
 <navigation>
   <script>
     require('./navigation-item')
     this.itemValue = 'item'
-    this.obj = {}
+    this.obj = {with_references: true}
     this.handler = function (e) {
       console.log(e) // {details: 'response'}
     }
     this.clickHandler = function (e) {}
   </script>
   ...
-  <navigation-item d-value=${this.itemValue} 
-    obj=${this.obj} 
-    eventName=${this.handler} 
-    click=${this.clickHandler} />
+  <navigation-item d-value={this.itemValue} 
+    obj={this.obj} 
+    eventName={this.handler} 
+    onclick={this.clickHandler} />
   ...
 </navigation>
 
 <!-- ./navigation-item.tag -->
 <navigation-item>
   <script>
-    console.log(this.getAttribute('d-value')) // item
-    console.log(this.state.obj) // {}
+    console.log(this.props['d-value']) // "item"
+    console.log(this.props.obj) // {with_references: true}
     this.clickHandler = function (e) {
       this.emit('eventName', 'response') // will trigger any event's handlers
     }
   </script>
-  <div click=${this.clickHandler}></div>
+  <div onclick={this.clickHandler}></div>
 </navigation-item>
 ```
 
@@ -168,7 +171,7 @@ require('./components/my-app.tag')
   <script>
     this.show = false
   </script>
-  <h1 if=${this.show}>
+  <h1 if={this.show}>
     H1 Text
   </h1>
 </navigation>
@@ -182,8 +185,8 @@ require('./components/my-app.tag')
     this.items = [1, 2, 3]
   </script>
   <ul>
-    <each itemValue, itemIndex in ${this.items}>
-      <li>${itemIndex} - ${itemValue}</li>
+    <each itemValue, itemIndex in {this.items}>
+      <li>{itemIndex} - {itemValue}</li>
     </each>
   </ul>
 </navigation>
@@ -196,17 +199,6 @@ require('./components/my-app.tag')
 1. `updated` - every time after tag is updated and rendered to dom
 1. `mounted` - only once tag is mounted and updated into dom
 1. `unmounted` - when tag is removed from dom
-
-### freeze dom elements
-
-The `div` wont be re-rendered when `my-tag` updates leaving a space for integration
-with other libraries working with dom
-
-```
-<my-tag>
-  <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
-</my-tag>
-```
 
 ### control re-rendering of tags
 
@@ -222,29 +214,11 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
-### virtual nodes
-
-```html
-<my-tag>
-  <virtual>
-    <span>Hello</span>
-  </virtual>
-</my-tag>
-```
-
-renders as
-
-```html
-<my-tag>
-  <span>Hello</span>
-</my-tag>
-```
-
 ### oid attribute
 
 Oval automatically assigns oid attributes during compilation of `.tag` files for:
 
-* nodes having `if=${}` statements
+* nodes having `if={}` statements
 * iterated nodes within `<each></each>` loop
 
 :warning: This attribute has a special meaning for rendering engines to be able to execute

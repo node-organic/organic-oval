@@ -8,14 +8,14 @@ test('tag-file', function () {
 </tag-name>
 `
 
-  var expectedCompiledCode = `module.exports = require('organic-oval').define({
+  var expectedCompiledCode = `/** @jsx createElement */ module.exports = require('organic-oval').define({
   tagName: "tag-name",
   tagLine: "",
   script: function () {
     var constructorCode = true
   },
-  template: function () {
-    return this.html\`<h1>html test</h1>\`
+  template: function (createElement) {
+    return <h1>html test</h1>
   }
 })
 `

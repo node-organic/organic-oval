@@ -67,6 +67,9 @@ var parseIfs = function (lines) {
       var statement = extractStatement(parsedLine)
       var attributes = extractAttributes(statement, parsedLine)
 
+      let openBr = '{'
+      let closeBr = '}'
+
       if (lines[i].indexOf('/>') === -1 && lines[i].indexOf('</' + nodeName + '>') === -1) {
         // buffer lines between start and end closing tag when not on the same line
         var buffer = []
@@ -94,17 +97,17 @@ var parseIfs = function (lines) {
           k -= 1
         }
         // re-construct attributes with oid marker included
-        if (attributes.indexOf('oid=') === -1) {
-          attributes = 'oid={this.oid + "-if' + ifcount + '"} ' + attributes
+        if (attributes.indexOf('key=') === -1) {
+          attributes = 'key={this.oid + "-if' + ifcount + '"} ' + attributes
         }
         // rewrite opening tag with if statement
-        lines[i] = '{' + statement + ' ? <' + nodeName + ' ' + attributes + '>'
+        lines[i] = openBr + statement + ' ? <' + nodeName + ' ' + attributes + '>'
         // insert any buffered content at next line of `i + k`
         for (let k = 0; k < buffer.length; k++) {
           lines.splice(i + k + 1, 0, buffer[k])
         }
         // insert closing tag
-        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '> : null}')
+        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '> : null' + closeBr)
       } else {
         // single line if statement such as `<p if=${statement}>text</p>``
 
@@ -113,47 +116,28 @@ var parseIfs = function (lines) {
 
         // re-construct attributes with oid marker
         let parts = lineWithoutStatement.trim().split(' ')
-        if (lineWithoutStatement.indexOf('oid') === -1) {
-          parts.splice(1, 0, 'oid={this.oid + "-if' + ifcount + '"}')
+        if (lineWithoutStatement.indexOf('key') === -1) {
+          parts.splice(1, 0, 'key={this.oid + "-if' + ifcount + '"}')
         }
         lineWithoutStatement = parts.join(' ')
 
         // rewrite the line
-        lines[i] = '{' + statement + ' ? ' + lineWithoutStatement + ' : null}'
+        lines[i] = openBr + statement + ' ? ' + lineWithoutStatement + ' : null' + closeBr
       }
     }
   }
 }
 
 var parseLoops = function (lines) {
-  let mapcount = -1
-  let shouldSetOID = null
   for (var i = 0; i < lines.length; i++) {
-    if (shouldSetOID) {
-      if (lines[i].indexOf('oid=') === -1) {
-        let parts = lines[i].trim().split('>')
-        parts[0] += ' oid={this.oid + "-map' + mapcount + '-" + ' + shouldSetOID + '}'
-        lines[i] = parts.join('>')
-      }
-      shouldSetOID = null
-    }
     if (lines[i].indexOf('<each ') !== -1) {
-      mapcount += 1
       let openingTag = lines[i].trim().slice('<each'.length, -1)
       let params = openingTag.split(' in ')[0].trim()
-      let indexVariableName = 'index'
-      if (params.indexOf(',') !== -1) {
-        indexVariableName = params.split(',')[1].trim()
-      } else {
-        params += ', ' + indexVariableName
-      }
       let model = openingTag.split(' in ')[1].trim().slice('{'.length, -1) // get the model, removing ${ and }
-      lines[i] = `{ ${model}.map((${params}) => (`
-      shouldSetOID = indexVariableName
+      lines[i] = `{ ${model}.map((${params}) => `
     }
     if (lines[i].indexOf('</each>') !== -1) {
-      lines[i] = lines[i].replace('</each>', '))}')
-      shouldSetOID = null
+      lines[i] = lines[i].replace('</each>', ')}')
     }
   }
 }

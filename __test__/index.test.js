@@ -1,13 +1,12 @@
-const oval = require('../../../index')
-Object.assign(oval, require('../../../engines/incremental-dom'))
+const oval = require('../index')
 
 oval.define({
   tagName: 'custom-tag',
-  template: function () { return this.html`<h1>test</h1>` }
+  template: function (h) { return h('h1', null, 'test') }
 })
 oval.define({
   tagName: 'parent-custom-tag',
-  template: function () { return this.html`<custom-tag />` }
+  template: function (h) { return h('custom-tag') }
 })
 oval.define({
   tagName: 'custom-tag-with-events',
@@ -28,7 +27,7 @@ oval.define({
       this.unmountedCalled = true
     })
   },
-  template: function () { return this.html`<div>events</div>` }
+  template: function (h) { return h('div', null, 'events') }
 })
 
 test('mounts', function () {
@@ -54,14 +53,14 @@ test('mounts and fires lifecycle events', function () {
   let beforeMount = document.body.children.length
   var el = document.createElement('custom-tag-with-events')
   document.body.appendChild(el)
-  oval.upgrade(el)
-  expect(el.mountCalled).toEqual(true)
-  expect(el.updateCalled).toEqual(true)
-  expect(el.updatedCalled).toEqual(true)
-  expect(el.mountedCalled).toEqual(true)
+  let component = oval.upgrade(el)
+  expect(component.mountCalled).toEqual(true)
+  expect(component.updateCalled).toEqual(true)
+  expect(component.updatedCalled).toEqual(true)
+  expect(component.mountedCalled).toEqual(true)
   expect(document.body.children.length).toEqual(beforeMount + 1)
   expect(document.body.lastChild.children[0].tagName).toEqual('DIV')
-  el.unmount()
-  expect(el.unmountedCalled).toEqual(true)
+  component.unmount()
   expect(document.body.children.length).toEqual(beforeMount)
+  expect(component.unmountedCalled).toEqual(true)
 })

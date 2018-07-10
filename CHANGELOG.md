@@ -4,14 +4,14 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [5.0.0] - YYYY-MM-DD
 
-:warning: this release breaks towards 4.2.0 completely. :warning:
+:warning: this release breaks towards 4.2.0 :warning:
 
 ### Breaking changes
 
 * `compilers/tag-file` - delegates all js specific component definition to *the runtime*
-* `index.js` - represents an singleton commonjs module aka *the runtime*
+* `index.js` - represents an singleton commonjs module aka *the runtime* with default renderer `preact`
 * `directives` are removed
-* `BaseTag` api is refactored as a `lib/custom-element.js` mixin
+* `BaseTag` api is removed
 * `tag.plasma` is removed and custom elements dispatch custom dom events on themselfs
 
 ## *[4.2.0]* - 2017-03-12

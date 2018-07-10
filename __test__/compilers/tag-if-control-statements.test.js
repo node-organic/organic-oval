@@ -3,7 +3,7 @@ var compiler = require('../../compilers/tag-control-statements')
 test('does not strip el attributes', function () {
   var content = `
     <tag-name>
-      <div if=\${test} class="test-class">
+      <div if={test} class="test-class">
         <h1>html test</h1>
       </div>
     </tag-name>
@@ -11,13 +11,12 @@ test('does not strip el attributes', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test
-          ? this.html\`
-            <div oid="\${this.oid}-if0" class="test-class">
+          ?
+            <div key={this.oid+"-if0"} class="test-class">
               <h1>html test</h1>
             </div>
-          \`
           : null
       }
     </tag-name>
@@ -30,7 +29,7 @@ test('does not strip el attributes', function () {
 test('compiles with spaces', function () {
   var content = `
     <tag-name>
-      <div if=\${test && test2} class="test-class">
+      <div if={test && test2} class="test-class">
         <h1>html test</h1>
       </div>
     </tag-name>
@@ -38,13 +37,12 @@ test('compiles with spaces', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test && test2
-          ? this.html\`
-            <div oid="\${this.oid}-if0" class="test-class">
+          ?
+            <div key={this.oid+"-if0"} class="test-class">
               <h1>html test</h1>
             </div>
-          \`
           : null
       }
     </tag-name>
@@ -57,25 +55,23 @@ test('compiles with spaces', function () {
 test('compiles on the same line', function () {
   var content = `
     <tag-name>
-      <h1 if=\${test && test2} class="test-class">test</h1>
-      <img if=\${test && test2} src="test-uri" />
+      <h1 if={test && test2} class="test-class">test</h1>
+      <img if={test && test2} src="test-uri" />
     </tag-name>
   `
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test && test2
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class">test</h1>
-          \`
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class">test</h1>
           : null
       }
-      \${
+      {
         test && test2
-          ? this.html\`
-            <img oid="\${this.oid}-if1" src="test-uri" />
-          \`
+          ?
+            <img key={this.oid+"-if1"} src="test-uri" />
           : null
       }
     </tag-name>
@@ -88,25 +84,23 @@ test('compiles on the same line', function () {
 test('compiles a complicated statement with function', function () {
   var content = `
     <tag-name>
-      <h1 if=\${test && this.test(function (item) { return item.if })} class="test-class">test</h1>
-      <h1 if=\${test && this.test(function (item) { return item.if })}>test</h1>
+      <h1 if={test && this.test(function (item) { return item.if })} class="test-class">test</h1>
+      <h1 if={test && this.test(function (item) { return item.if })}>test</h1>
     </tag-name>
   `
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test && this.test(function (item) {return item.if})
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class">test</h1>
-          \`
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class">test</h1>
           : null
       }
-      \${
+      {
         test && this.test(function (item) {return item.if})
-          ? this.html\`
-            <h1 oid="\${this.oid}-if1">test</h1>
-          \`
+          ?
+            <h1 key={this.oid+"-if1"}>test</h1>
           : null
       }
     </tag-name>
@@ -119,7 +113,7 @@ test('compiles a complicated statement with function', function () {
 test('compiles a statement along other expressions', function () {
   var content = `
     <tag-name>
-      <h1 class="test-class" if=\${test} id=\${tag.id} href=\${tag.href}>
+      <h1 class="test-class" if={test} id={tag.id} href={tag.href}>
         test
       </h1>
     </tag-name>
@@ -127,13 +121,12 @@ test('compiles a statement along other expressions', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class" id=\${tag.id} href=\${tag.href}>
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class" id={tag.id} href={tag.href}>
               test
             </h1>
-          \`
           : null
       }
     </tag-name>
@@ -146,7 +139,7 @@ test('compiles a statement along other expressions', function () {
 test('compiles a complicated multiline statement', function () {
   var content = `
     <tag-name>
-      <h1 if=\${test}
+      <h1 if={test}
         class="test-class">
         test
       </h1>
@@ -155,13 +148,12 @@ test('compiles a complicated multiline statement', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         test
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class">
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class">
               test
             </h1>
-          \`
           : null
       }
     </tag-name>
@@ -174,7 +166,7 @@ test('compiles a complicated multiline statement', function () {
 test('compiles a statement with arrow function', function () {
   var content = `
     <tag-name>
-      <h1 if=\${items.map((a) => {return a.value})}
+      <h1 if={items.map((a) => {return a.value})}
         class="test-class">
         test
       </h1>
@@ -183,13 +175,12 @@ test('compiles a statement with arrow function', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         items.map((a) => {return a.value})
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class">
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class">
               test
             </h1>
-          \`
           : null
       }
     </tag-name>
@@ -202,7 +193,7 @@ test('compiles a statement with arrow function', function () {
 test('compiles a statement arrow within', function () {
   var content = `
     <tag-name>
-      <h1 if=\${tag.value > 0}
+      <h1 if={tag.value > 0}
         class="test-class">
         test
       </h1>
@@ -211,13 +202,12 @@ test('compiles a statement arrow within', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         tag.value > 0
-          ? this.html\`
-            <h1 oid="\${this.oid}-if0" class="test-class">
+          ?
+            <h1 key={this.oid+"-if0"} class="test-class">
               test
             </h1>
-          \`
           : null
       }
     </tag-name>
@@ -230,7 +220,7 @@ test('compiles a statement arrow within', function () {
 test('compiles a statement with same child tag names', function () {
   var content = `
     <tag-name>
-      <div if=\${tag.value > 0}
+      <div if={tag.value > 0}
         class="test-class">
         <div>
           text
@@ -241,15 +231,14 @@ test('compiles a statement with same child tag names', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         tag.value > 0
-          ? this.html\`
-            <div oid="\${this.oid}-if0" class="test-class">
+          ?
+            <div key={this.oid+"-if0"} class="test-class">
               <div>
                 text
               </div>
             </div>
-          \`
           : null
       }
     </tag-name>
@@ -262,9 +251,9 @@ test('compiles a statement with same child tag names', function () {
 test('compiles a statement with nested statements', function () {
   var content = `
     <tag-name>
-      <div if=\${tag.value > 0}
+      <div if={tag.value > 0}
         class="test-class">
-        <div if=\${tag.value < 0}>
+        <div if={tag.value < 0}>
           text
         </div>
       </div>
@@ -273,19 +262,18 @@ test('compiles a statement with nested statements', function () {
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         tag.value > 0
-          ? this.html\`
-            <div oid="\${this.oid}-if0" class="test-class">
-              \${
-                tag.value < 0 ? this.html\`
-                  <div oid="\${this.oid}-if1">
+          ?
+            <div key={this.oid+"-if0"} class="test-class">
+              {
+                tag.value < 0 ?
+                  <div key={this.oid+"-if1"}>
                     text
                   </div>
-                \` : null
+                 : null
               }
             </div>
-          \`
           : null
       }
     </tag-name>
@@ -298,17 +286,16 @@ test('compiles a statement with nested statements', function () {
 test('compiles a single line statement with inner expressions', function () {
   var content = `
     <tag-name>
-      <span if=\${method(arg1, arg2)}>\${fn1('arg1')} \${fn2.inner(arg2)}</span>
+      <span if={method(arg1, arg2)}>{fn1('arg1')} {fn2.inner(arg2)}</span>
     </tag-name>
   `
 
   var expectedCompiledCode = `
     <tag-name>
-      \${
+      {
         method(arg1, arg2)
-          ? this.html\`
-            <span oid="\${this.oid}-if0">\${fn1('arg1')} \${fn2.inner(arg2)}</span>
-          \`
+          ?
+            <span key={this.oid+"-if0"}>{fn1('arg1')} {fn2.inner(arg2)}</span>
           : null
       }
     </tag-name>

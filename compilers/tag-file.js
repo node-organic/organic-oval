@@ -38,7 +38,29 @@ module.exports.compile = function (content) {
   var scriptContent = extractScript(lines)
   var tagInfo = extractTagInfo(lines)
   var htmlContent = lines.join('\n')
-  var result = `module.exports = require('organic-oval').define({
+
+  // @WORKAROUND
+  /** having this case happens when dealing with component
+  <my-comp>
+    <div if={statement}>...
+  </my-comp>
+
+  ie the if happens to be on the first element, therefore its
+  invalid js code as such
+  template: function () {
+    return {statement ? <div>... : null}
+  }
+
+  so we are doing a workaround to fix up after the `tag-control-statements`
+  */
+  if (htmlContent.indexOf('{') === 0) {
+    htmlContent = htmlContent.slice(1, -1)
+  }
+
+  var result = `
+  /** @jsx createElement */
+
+  module.exports = require('organic-oval').define({
     tagName: "${tagInfo.tagName}",
     tagLine: "${tagInfo.tagLine}",
     script: function () { ${scriptContent.trim()} },
