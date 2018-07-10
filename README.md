@@ -48,23 +48,23 @@ module.exports = {
 
 ### use
 
+```html
+<!-- ./index.html -->
+<html>
+  <body>
+    <my-app></my-app>
+    <script src='./bundle.js'></script>
+  </body>
+</html>
+```
+
 ```js
-// dist/bundle.js
-let oval = require('organic-oval')
-Object.assign(oval, require('organic-oval/engines/preact'))
+// ./bundle.js
 require('./components/my-app.tag')
 ```
 
 ```html
-<!-- index.html -->
-<html>
-  <body>
-    <my-app></my-app>
-    <script src='dist/bundle.js'></script>
-  </body>
-</html>
-
-<!-- my-app.tag -->
+<!-- ./my-app.tag -->
 <my-app>
   <h1>Welcome!</h1>
 </my-app>
@@ -75,14 +75,14 @@ require('./components/my-app.tag')
 ```html
 <navigation>
   <script>
-    this.links = {
+    this.state.links = {
       home: '#home',
       about: '#about'
     }
   </script>
   <ul class="navigation">
-    <li><a href={this.links.home}>Home</a></li>
-    <li><a href={this.links.about}>About</a></li>
+    <li><a href={this.state.links.home}>Home</a></li>
+    <li><a href={this.state.links.about}>About</a></li>
   </ul>
 </navigation>
 ```
@@ -114,16 +114,16 @@ require('./components/my-app.tag')
     require('./navigation-item')
     this.itemValue = 'item'
     this.obj = {with_references: true}
-    this.handler = function (e) {
-      console.log(e) // {details: 'response'}
+    this.handler = (value) => {
+      console.log(value) // 'response'
     }
-    this.clickHandler = function (e) {}
+    this.clickHandler = (e) => {}
   </script>
   ...
-  <navigation-item d-value={this.itemValue} 
+  <navigation-item 
+    d-value={this.itemValue} 
     obj={this.obj} 
-    eventName={this.handler} 
-    onclick={this.clickHandler} />
+    eventName={this.handler} />
   ...
 </navigation>
 
@@ -132,11 +132,9 @@ require('./components/my-app.tag')
   <script>
     console.log(this.props['d-value']) // "item"
     console.log(this.props.obj) // {with_references: true}
-    this.clickHandler = function (e) {
-      this.emit('eventName', 'response') // will trigger any event's handlers
-    }
+    this.emit('eventName', 'response') // will trigger any event's handlers
   </script>
-  <div onclick={this.clickHandler}></div>
+  <div></div>
 </navigation-item>
 ```
 
@@ -192,14 +190,6 @@ require('./components/my-app.tag')
 </navigation>
 ```
 
-### Lifecycle events
-
-1. `mount` - only once on mount
-1. `update` - every time when tag is updated (respectively on first mount too)
-1. `updated` - every time after tag is updated and rendered to dom
-1. `mounted` - only once tag is mounted and updated into dom
-1. `unmounted` - when tag is removed from dom
-
 ### control re-rendering of tags
 
 The following tag won't re-render itself and will not be replaced by parent tag updates as long as it is instantiated and part of the dom.
@@ -214,47 +204,7 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
-### oid attribute
-
-Oval automatically assigns oid attributes during compilation of `.tag` files for:
-
-* nodes having `if={}` statements
-* iterated nodes within `<each></each>` loop
-
-:warning: This attribute has a special meaning for rendering engines to be able to execute
-properly dom diff & re-render algorithms especially in cases with similar dom node shapes siblings to each other.
-
-## HowTo
-
-### define components at runtime
-
-```js
-require('organic-oval').define({
-  tagName: 'my-tag',
-  script: function () {},
-  template: function (html) {return html`<div>inner component content</div>`}
-})
-```
-
-### create components at runtime
-
-```js
-let el = document.createElement('my-tag')
-require('organic-oval').upgrade(el)
-```
-
 ## API
-
-### oval.html(component)
-The method returns tagged template function, see [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
-
-The tagged template function (scoped to the component) `component.html` then is used by 
-`component.template()` implementations to render component's representation accordingly to
-its state.
-
-### oval.render(component)
-The method returns render function (scoped to the component) which patches
-components representation to match the one accordingly to `component.template()`
 
 ### oval.define(options)
 The method defines a component accordingly to its options:
@@ -262,14 +212,85 @@ The method defines a component accordingly to its options:
 * `tagName`: String
 * `tagLine`: String
 * `script()`: Function
-* `template(html)`: Function
+* `template(createElement)`: Function
 
-:warning: Note that this method also upgrades all matched document.body elements by `tagName`
+:warning: Note that the method also upgrades any document.body elements by `tagName`
+
+```js
+/** @jsx createElement */
+require('organic-oval').define({
+  tagName: 'my-tag',
+  script: function () {},
+  template: function (createElement) {
+    return <div>tag content</div>
+  }
+})
+```
 
 ### oval.upgrade(el)
 
 The method upgrades given NodeElement `el` accordingly to previously defined 
-component with matching `el.tagName`
+component with matching `el.tagName`.
+
+Returns reference to the newly created component. Calling the method also sets `el.component` reference to the created component.
+
+```js
+let el = document.createElement('my-tag')
+document.body.appendChild(el)
+require('organic-oval').upgrade(el)
+```
+
+### Component API
+Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
+
+#### shadowRoot
+Returns reference to the rendered root element.
+
+#### update
+Instructs to do a `forceUpdate` of the component. Fires `update` related events.
+
+#### unmount
+Removes the component and its custom element from dom. Fires `unmount` events.
+
+#### on(eventName, eventHandler)
+Start receiving emitted events. By default Oval Components self emit their Lifecycle events as follows:
+
+##### Lifecycle events
+
+1. `mount` - only once on mount
+1. `update` - every time when tag is updated (respectively on first mount too)
+1. `updated` - every time after tag is updated and rendered to dom
+1. `mounted` - only once tag is mounted and updated into dom
+1. `unmounted` - when tag is removed from dom
+
+Additionally any functions been passed to oval components as custom element attributes will be automatically subscribed to the component:
+
+```
+<my-container>
+  <script>
+    this.myCustomEventHandler = function (eventData) {
+      // triggered every second by `my-component`
+    }
+  </script>
+  <my-component customEvent={this.myCustomEventHandler} />
+</my-container>
+
+<my-component>
+  <script>
+    this.on('mounted', () => {
+      setInterval(() => {
+        this.emit('customEvent', 'customEventData')
+      }, 1000)
+    })
+  </script>
+</my-component>
+```
+
+#### off(eventName, eventHandler)
+Stop receiving events
+
+#### emit(eventName, eventData)
+Publish `eventName` with optional `eventData` to all subscribers.
 
 ## Known Compiler Issues
 

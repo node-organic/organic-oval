@@ -2,21 +2,10 @@ const {h, render, Component} = require('preact')
 const components = {}
 let OID = 0
 
-const attributesOnly = function (props) {
-  let result = {}
-  for (let key in props) {
-    if (typeof props[key] === 'function' || typeof props[key] === 'object') {
-      continue
-    }
-    result[key] = props[key]
-  }
-  return result
-}
-
 const buildCreateElement = function (component) {
   return (tagName, props, ...kids) => {
     if (components[tagName.toUpperCase()]) {
-      return h(tagName, attributesOnly(props), h(components[tagName.toUpperCase()], props, kids))
+      return h(tagName, null, h(components[tagName.toUpperCase()], props, kids))
     } else {
       return h(tagName, props, kids)
     }
@@ -48,13 +37,6 @@ module.exports.define = function (options) {
     componentWillMount () {
       this.emit('mount')
       this.emit('update')
-      for (let key in this.props) {
-        let isPropFunction = typeof this.props[key] === 'function'
-        let isDOMEvent = key.indexOf('on') === 0
-        if (isPropFunction && !isDOMEvent) {
-          this.on(key, this.props[key])
-        }
-      }
     }
     componentWillUpdate () {
       this.emit('update')
@@ -62,12 +44,19 @@ module.exports.define = function (options) {
     componentDidUpdate () {
       this.emit('updated')
     }
-    handleEvents (e) {
-      this.emit(e.eventName, e.detail)
-    }
     componentDidMount () {
       this.shadowRoot.parentNode.component = this
-      this.shadowRoot.parentNode.handleEvent = this.handleEvents.bind(this)
+      for (let key in this.props) {
+        let isPropFunction = typeof this.props[key] === 'function'
+        let isDOMEvent = key.indexOf('on') === 0
+        if (isPropFunction) {
+          if (isDOMEvent) {
+            this.shadowRoot.parentNode[key] = this.props[key]
+          } else {
+            this.on(key, this.props[key])
+          }
+        }
+      }
       this.emit('updated')
       this.emit('mounted')
     }
