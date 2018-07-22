@@ -37,8 +37,7 @@ module.exports = {
         test: /\.tag$/,
         exclude: /node_modules/,
         use: [
-          {loader: 'organic-oval/webpack/oval-loader'},
-          {loader: 'organic-oval/webpack/oval-control-statements-loader'}
+          {loader: 'organic-oval/webpack/oval-loader'}
         ]
       }
     ]
@@ -123,7 +122,8 @@ require('./components/my-app.tag')
   <navigation-item 
     d-value={this.itemValue} 
     obj={this.obj} 
-    eventName={this.handler} />
+    eventName={this.handler}
+    onclick={this.clickHandler} />
   ...
 </navigation>
 
@@ -132,7 +132,10 @@ require('./components/my-app.tag')
   <script>
     console.log(this.props['d-value']) // "item"
     console.log(this.props.obj) // {with_references: true}
-    this.emit('eventName', 'response') // will trigger any event's handlers
+    this.emit('eventName', 'response') // triggers eventName handlers
+    this.on('mounted', () => {
+      this.shadowRoot.triggerEvent(new Event('click')) // triggers click
+    })
   </script>
   <div></div>
 </navigation-item>
@@ -244,7 +247,7 @@ require('organic-oval').upgrade(el)
 Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
 
 #### shadowRoot
-Returns reference to the rendered root element.
+Returns reference to the rendered `shadowRoot` element.
 
 #### update
 Instructs to do a `forceUpdate` of the component. Fires `update` related events.

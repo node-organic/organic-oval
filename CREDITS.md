@@ -1,4 +1,5 @@
 # CREDITS
 
-* dom rendering uses [`incremental-dom`](https://github.com/google/incremental-dom)
-* templates are via [`hyperx`](https://github.com/choojs/hyperx)
+* dom rendering - [`preact`](https://preactjs.com/)
+* jsx tag transform - [`babel`](https://babeljs.io/)
+* tag compilation - [`webpack`](https://webpack.js.org/)

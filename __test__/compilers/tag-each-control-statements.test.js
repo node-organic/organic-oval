@@ -1,4 +1,5 @@
-var compiler = require('../../compilers/tag-control-statements')
+const compiler = require('../../compilers/tag-file')
+const utils = require('../utils')
 
 test('compiles', function () {
   var content = `
@@ -9,18 +10,16 @@ test('compiles', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        items.map((item) =>
-          <h2>{item}</h2>
-        )
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      items.map((item) =>
+        <h2>{item}</h2>
+      )
+    }`
+  })
 })
 
 test('compiles multiple each statements', function () {
@@ -35,23 +34,21 @@ test('compiles multiple each statements', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        items.map((item) =>
-          <h2>{item}</h2>
-        )
-      }
-      {
-        items.map((item, index) =>
-          <h2>{item}-{index}</h2>
-        )
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      items.map((item) =>
+        <h2>{item}</h2>
+      )
+    }
+    {
+      items.map((item, index) =>
+        <h2>{item}-{index}</h2>
+      )
+    }`
+  })
 })
 
 test('compiles multiple nested each statements', function () {
@@ -65,22 +62,19 @@ test('compiles multiple nested each statements', function () {
       </each>
     </tag-name>
   `
-
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        items.map((item) =>
-          <h2>{item}</h2>
-          {
-            items.map((item) =>
-              <h1>{item}</h1>
-            )
-          }
-        )
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      items.map((item) =>
+        <h2>{item}</h2>
+        {
+          items.map((item) =>
+            <h1>{item}</h1>
+          )
+        }
+      )
+    }`
+  })
 })

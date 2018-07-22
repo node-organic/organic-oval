@@ -4,8 +4,29 @@ let OID = 0
 
 const buildCreateElement = function (component) {
   return (tagName, props, ...kids) => {
+    if (tagName.toUpperCase() === 'SLOT' && component.props) {
+      let childs = component.props.children
+      for (let i = 0; i < childs.length; i++) {
+        if (childs[i].attributes && childs[i].attributes.slot === props.name) {
+          return childs[i]
+        }
+      }
+    }
     if (components[tagName.toUpperCase()]) {
-      return h(tagName, null, h(components[tagName.toUpperCase()], props, kids))
+      let custom_el_props = {}
+      if (props) {
+        custom_el_props.key = props.key
+        custom_el_props.slot = props.slot
+        for (let key in props) {
+          let isPropFunction = typeof props[key] === 'function'
+          let isDOMEvent = key.indexOf('on') === 0
+          if (isPropFunction && isDOMEvent) {
+            custom_el_props[key] = props[key]
+            delete props[key]
+          }
+        }
+      }
+      return h(tagName, custom_el_props, h(components[tagName.toUpperCase()], props, kids))
     } else {
       return h(tagName, props, kids)
     }
@@ -33,6 +54,9 @@ module.exports.define = function (options) {
         get: () => this.base
       })
       if (options.script) options.script.call(this)
+      if (options.template) {
+        this.template = options.template.bind(this)
+      }
     }
     componentWillMount () {
       this.emit('mount')
@@ -47,14 +71,8 @@ module.exports.define = function (options) {
     componentDidMount () {
       this.shadowRoot.parentNode.component = this
       for (let key in this.props) {
-        let isPropFunction = typeof this.props[key] === 'function'
-        let isDOMEvent = key.indexOf('on') === 0
-        if (isPropFunction) {
-          if (isDOMEvent) {
-            this.shadowRoot.parentNode[key] = this.props[key]
-          } else {
-            this.on(key, this.props[key])
-          }
+        if (typeof this.props[key] === 'function') {
+          this.on(key, this.props[key])
         }
       }
       this.emit('updated')
@@ -68,24 +86,7 @@ module.exports.define = function (options) {
       return this.shouldRender
     }
     render (props) {
-      let result = options.template.call(this, this.createElement)
-      if (!result) return result
-      let parentKids = this.props.children
-      let kids = result.children
-      if (kids && parentKids) {
-        for (let i = 0; i < parentKids.length; i++) {
-          if (parentKids[i].attributes && parentKids[i].attributes.slot) {
-            for (let k = 0; k < kids.length; k++) {
-              let isSlot = kids[i].nodeName === 'slot'
-              let sameSlotName = kids[i].attributes && kids[i].attributes.name === parentKids[i].attributes.slot
-              if (isSlot && sameSlotName) {
-                kids[i] = parentKids[i]
-              }
-            }
-          }
-        }
-      }
-      return result
+      return this.template(this.createElement)
     }
     update () {
       if (!this.shouldRender) return

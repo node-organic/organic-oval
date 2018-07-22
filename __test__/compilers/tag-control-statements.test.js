@@ -1,4 +1,5 @@
-var compiler = require('../../compilers/tag-control-statements')
+const compiler = require('../../compilers/tag-file')
+const utils = require('../utils')
 
 test('compiles both if and each separately', function () {
   var content = `
@@ -12,26 +13,24 @@ test('compiles both if and each separately', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test
-        ?
-          <h1 key={this.oid + "-if0"}>
-            html test
-          </h1>
-        : null
-      }
-      {
-        items.map((item) =>
-          <h2>{item}</h2>
-        )
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test
+      ?
+        <h1 key={this.oid + "-if0"}>
+          html test
+        </h1>
+      : null
+    }
+    {
+      items.map((item) =>
+        <h2>{item}</h2>
+      )
+    }`
+  })
 })
 
 test('compiles if with inner each', function () {
@@ -46,26 +45,24 @@ test('compiles if with inner each', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test
-        ?
-          <h1 key={this.oid + "-if0"}>
-            html test
-            {
-              items.map((item) =>
-                <h2>{item}</h2>
-              )
-            }
-          </h1>
-        : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test
+      ?
+        <h1 key={this.oid + "-if0"}>
+          html test
+          {
+            items.map((item) =>
+              <h2>{item}</h2>
+            )
+          }
+        </h1>
+      : null
+    }`
+  })
 })
 
 test('compiles each with inner if', function () {
@@ -82,26 +79,24 @@ test('compiles each with inner if', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        items.map((item) =>
-          <div>
-            <h2>{item}</h2>
-            {
-              test
-              ?
-                <h1 key={this.oid+"-if0"}>
-                  html test
-                </h1>
-              : null
-            }
-          </div>
-        )
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      items.map((item) =>
+        <div>
+          <h2>{item}</h2>
+          {
+            test
+            ?
+              <h1 key={this.oid+"-if0"}>
+                html test
+              </h1>
+            : null
+          }
+        </div>
+      )
+    }`
+  })
 })

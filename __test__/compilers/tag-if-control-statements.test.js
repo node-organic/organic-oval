@@ -1,4 +1,5 @@
-var compiler = require('../../compilers/tag-control-statements')
+const compiler = require('../../compilers/tag-file')
+const utils = require('../utils')
 
 test('does not strip el attributes', function () {
   var content = `
@@ -9,21 +10,19 @@ test('does not strip el attributes', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test
-          ?
-            <div key={this.oid+"-if0"} class="test-class">
-              <h1>html test</h1>
-            </div>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test
+        ?
+          <div key={this.oid+"-if0"} class="test-class">
+            <h1>html test</h1>
+          </div>
+        : null
+    }`
+  })
 })
 
 test('compiles with spaces', function () {
@@ -34,22 +33,19 @@ test('compiles with spaces', function () {
       </div>
     </tag-name>
   `
-
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test && test2
-          ?
-            <div key={this.oid+"-if0"} class="test-class">
-              <h1>html test</h1>
-            </div>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test && test2
+        ?
+          <div key={this.oid+"-if0"} class="test-class">
+            <h1>html test</h1>
+          </div>
+        : null
+    }`
+  })
 })
 
 test('compiles on the same line', function () {
@@ -60,25 +56,23 @@ test('compiles on the same line', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test && test2
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class">test</h1>
-          : null
-      }
-      {
-        test && test2
-          ?
-            <img key={this.oid+"-if1"} src="test-uri" />
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test && test2
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class">test</h1>
+        : null
+    }
+    {
+      test && test2
+        ?
+          <img key={this.oid+"-if1"} src="test-uri" />
+        : null
+    }`
+  })
 })
 
 test('compiles a complicated statement with function', function () {
@@ -88,26 +82,23 @@ test('compiles a complicated statement with function', function () {
       <h1 if={test && this.test(function (item) { return item.if })}>test</h1>
     </tag-name>
   `
-
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test && this.test(function (item) {return item.if})
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class">test</h1>
-          : null
-      }
-      {
-        test && this.test(function (item) {return item.if})
-          ?
-            <h1 key={this.oid+"-if1"}>test</h1>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test && this.test(function (item) {return item.if})
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class">test</h1>
+        : null
+    }
+    {
+      test && this.test(function (item) {return item.if})
+        ?
+          <h1 key={this.oid+"-if1"}>test</h1>
+        : null
+    }`
+  })
 })
 
 test('compiles a statement along other expressions', function () {
@@ -118,22 +109,19 @@ test('compiles a statement along other expressions', function () {
       </h1>
     </tag-name>
   `
-
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class" id={tag.id} href={tag.href}>
-              test
-            </h1>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class" id={tag.id} href={tag.href}>
+            test
+          </h1>
+        : null
+    }`
+  })
 })
 
 test('compiles a complicated multiline statement', function () {
@@ -146,21 +134,19 @@ test('compiles a complicated multiline statement', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        test
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class">
-              test
-            </h1>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      test
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class">
+            test
+          </h1>
+        : null
+    }`
+  })
 })
 
 test('compiles a statement with arrow function', function () {
@@ -173,21 +159,19 @@ test('compiles a statement with arrow function', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        items.map((a) => {return a.value})
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class">
-              test
-            </h1>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      items.map((a) => {return a.value})
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class">
+            test
+          </h1>
+        : null
+    }`
+  })
 })
 
 test('compiles a statement arrow within', function () {
@@ -200,21 +184,19 @@ test('compiles a statement arrow within', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        tag.value > 0
-          ?
-            <h1 key={this.oid+"-if0"} class="test-class">
-              test
-            </h1>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      tag.value > 0
+        ?
+          <h1 key={this.oid+"-if0"} class="test-class">
+            test
+          </h1>
+        : null
+    }`
+  })
 })
 
 test('compiles a statement with same child tag names', function () {
@@ -229,23 +211,21 @@ test('compiles a statement with same child tag names', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        tag.value > 0
-          ?
-            <div key={this.oid+"-if0"} class="test-class">
-              <div>
-                text
-              </div>
-            </div>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      tag.value > 0
+        ?
+          <div key={this.oid+"-if0"} class="test-class">
+            <div>
+              text
+            </div>
+          </div>
+        : null
+    }`
+  })
 })
 
 test('compiles a statement with nested statements', function () {
@@ -260,27 +240,25 @@ test('compiles a statement with nested statements', function () {
     </tag-name>
   `
 
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        tag.value > 0
-          ?
-            <div key={this.oid+"-if0"} class="test-class">
-              {
-                tag.value < 0 ?
-                  <div key={this.oid+"-if1"}>
-                    text
-                  </div>
-                 : null
-              }
-            </div>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      tag.value > 0
+        ?
+          <div key={this.oid+"-if0"} class="test-class">
+            {
+              tag.value < 0 ?
+                <div key={this.oid+"-if1"}>
+                  text
+                </div>
+               : null
+            }
+          </div>
+        : null
+    }`
+  })
 })
 
 test('compiles a single line statement with inner expressions', function () {
@@ -289,18 +267,15 @@ test('compiles a single line statement with inner expressions', function () {
       <span if={method(arg1, arg2)}>{fn1('arg1')} {fn2.inner(arg2)}</span>
     </tag-name>
   `
-
-  var expectedCompiledCode = `
-    <tag-name>
-      {
-        method(arg1, arg2)
-          ?
-            <span key={this.oid+"-if0"}>{fn1('arg1')} {fn2.inner(arg2)}</span>
-          : null
-      }
-    </tag-name>
-  `
-
   var compiled = compiler.compile(content)
-  expect(compiled.trim().replace(/ /g, '').replace(/\n/g, '')).toEqual(expectedCompiledCode.trim().replace(/ /g, '').replace(/\n/g, ''))
+  utils.expectTagFile(compiled, {
+    tagName: 'tag-name',
+    script: '',
+    template: `{
+      method(arg1, arg2)
+        ?
+          <span key={this.oid+"-if0"}>{fn1('arg1')} {fn2.inner(arg2)}</span>
+        : null
+    }`
+  })
 })
