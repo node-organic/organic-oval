@@ -184,6 +184,11 @@ module.exports.compile = function (content) {
   parseIfs(lines)
   parseLoops(lines)
   var htmlContent = lines.join('\n')
+  if (tagInfo.tagLine.indexOf('no-shadow-root') === -1) {
+    htmlContent = '<shadow-root>' + htmlContent.trim() + '</shadow-root>'
+  } else {
+    htmlContent = htmlContent.trim()
+  }
   var result = `
   /** @jsx createElement */
 
@@ -193,7 +198,7 @@ module.exports.compile = function (content) {
       let tag = this
       ${scriptContent.trim()}
       this.template = function (createElement) {
-        return <shadow-root>${htmlContent.trim()}</shadow-root>
+        return ${htmlContent}
       }
     }
   })

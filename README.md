@@ -134,7 +134,7 @@ require('./components/my-app.tag')
     console.log(this.props.obj) // {with_references: true}
     this.emit('eventName', 'response') // triggers eventName handlers
     this.on('mounted', () => {
-      this.shadowRoot.triggerEvent(new Event('click')) // triggers click
+      this.shadowRoot.parentNode.triggerEvent(new Event('click')) // triggers click
     })
   </script>
   <div></div>
@@ -163,9 +163,7 @@ require('./components/my-app.tag')
 </app>
 ```
 
-### Using oval control statements
-
-#### IF conditional statements
+### Conditional control statements
 
 ```html
 <navigation>
@@ -178,7 +176,7 @@ require('./components/my-app.tag')
 </navigation>
 ```
 
-#### Loop control statements
+### Loop control statements
 
 ```html
 <navigation>
@@ -207,15 +205,93 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
+### shadow-root
+
+Oval components always render `shadow-root` element into dom as first child of the component's element. That is to provide API as close to custom elements as possible.
+You can disable this behaviour on per component basis by instructing compilation without shadow-root element wrapping via `no-shadow-root` attribute.
+
+The following:
+
+```html
+<!-- custom-element.tag -->
+<custom-element>
+  <div>text</div>
+  <div>text2</div>
+</custom-element>
+```
+
+Results in:
+
+```html
+<custom-element>
+  <shadow-root>
+    <div>text</div>
+    <div>text2</div>
+  </shadow-root>
+</custom-element>
+```
+
+To access `shadow-root` dom node use `shadowRoot` getter on component level 
+after component has been mounted.
+
+Having the following with `no-shadow-root`:
+
+```html
+<!-- custom-element.tag -->
+<custom-element no-shadow-root>
+  <div>text</div>
+</custom-element>
+```
+
+Results in:
+
+```html
+<custom-element>
+  <div>text</div>
+</custom-element>
+```
+
+Here `shadowRoot` getter will return reference to rendered `div` dom node.
+
+:warning: without shadow-root element the component should render only one root element
+
+### find oval component reference
+
+```html
+<!-- custom-element.tag -->
+<custom-element>
+  <script>
+    this.on('mounted', () => {
+      let el = this.shadowRoot.querySelector('another-custom-element')
+      let component = el.component
+      console.log(component) // reference to another-custom-element component
+    })
+  </script>
+  <another-custom-element />
+</custom-element>
+```
+
+### find oval component root dom node reference
+
+```html
+<!-- custom-element.tag -->
+<custom-element>
+  <script>
+    this.on('mounted', () => {
+      console.log(this.shadowRoot.parentNode) // reference to dom node `<CUSTOM-ELEMENT />`
+    })
+  </script>
+</custom-element>
+```
+
 ## API
 
 ### oval.define(options)
 The method defines a component accordingly to its options:
 
 * `tagName`: String
-* `tagLine`: String
 * `script()`: Function
-* `template(createElement)`: Function
+* `template(createElement)`: Function, *optional*
 
 :warning: Note that the method also upgrades any document.body elements by `tagName`
 
@@ -223,9 +299,10 @@ The method defines a component accordingly to its options:
 /** @jsx createElement */
 require('organic-oval').define({
   tagName: 'my-tag',
-  script: function () {},
-  template: function (createElement) {
-    return <div>tag content</div>
+  script: function () {
+    this.template = function (createElement) {
+      return <div>tag content</div>
+    }
   }
 })
 ```
@@ -243,11 +320,11 @@ document.body.appendChild(el)
 require('organic-oval').upgrade(el)
 ```
 
-### Component API
+### Oval Component API
 Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
 
 #### shadowRoot
-Returns reference to the rendered `shadowRoot` element.
+Returns reference to the rendered `<shadow-root>` element or to the component's base element in case `no-shadow-root` attribute is set.
 
 #### update
 Instructs to do a `forceUpdate` of the component. Fires `update` related events.
@@ -258,7 +335,7 @@ Removes the component and its custom element from dom. Fires `unmount` events.
 #### on(eventName, eventHandler)
 Start receiving emitted events. By default Oval Components self emit their Lifecycle events as follows:
 
-##### Lifecycle events
+##### Events
 
 1. `mount` - only once on mount
 1. `update` - every time when tag is updated (respectively on first mount too)
@@ -266,7 +343,7 @@ Start receiving emitted events. By default Oval Components self emit their Lifec
 1. `mounted` - only once tag is mounted and updated into dom
 1. `unmounted` - when tag is removed from dom
 
-Additionally any functions been passed to oval components as custom element attributes will be automatically subscribed to the component:
+Additionally any functions been passed to oval components will automatically subscribe:
 
 ```
 <my-container>
