@@ -6,6 +6,7 @@ describe('oval-compiler', function () {
       var constructorCode = true
     </script>
     <h1>html test</h1>
+    <CustomTagClass />
   </tag-name>
 `
 
@@ -19,7 +20,7 @@ describe('oval-compiler', function () {
       oval.BaseTag(tag, root, props, attrs)
       var constructorCode = true
       tag.render = function (createElement) {
-        return <virtual><h1>html test</h1></virtual>
+        return <virtual><h1>html test</h1><CustomTagClass /></virtual>
       }
     }
   }
