@@ -39,17 +39,31 @@ describe('oval', function () {
     expect(document.body.children.length).to.eq(1)
   })
 
-  it('appendAt', function () {
+  it('appendAt - tag name', function () {
     var el = document.createElement('div')
     document.body.appendChild(el)
     var tag = oval.appendAt(el, 'custom-tag')
     expect(tag).to.exist
   })
 
-  it('mountAt', function () {
+  it('appendAt - tag class', function () {
+    var el = document.createElement('div')
+    document.body.appendChild(el)
+    var tag = oval.appendAt(el, Tag)
+    expect(tag).to.exist
+  })
+
+  it('mountAt - tag name', function () {
     var el = document.createElement('div')
     document.body.appendChild(el)
     var tag = oval.mountAt(el, 'custom-tag')
+    expect(tag).to.exist
+  })
+
+  it('mountAt - tag class', function () {
+    var el = document.createElement('div')
+    document.body.appendChild(el)
+    var tag = oval.mountAt(el, Tag)
     expect(tag).to.exist
   })
 })

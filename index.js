@@ -1,4 +1,5 @@
-module.exports = {
+var isFunction = require('./lib/utils/isFunction')
+var ovalInstance = {
   registeredTags: [],
   init: function (plasma) {
     this.plasma = require('./lib/organic-plasma-dom')(plasma)
@@ -36,14 +37,26 @@ module.exports = {
     return tags
   },
   mountAt: function (el, tagName, props, attrs) {
-    var TagClass = this.getRegisteredTag(tagName)
+    var TagClass
+    if (isFunction(tagName)) {
+      TagClass = tagName
+      tagName = TagClass.tagName
+    } else {
+      TagClass = this.getRegisteredTag(tagName)
+    }
     if (!TagClass) throw new Error(tagName + ' not registered')
     var instance = new TagClass(el, props, attrs)
     instance.mount()
     return instance
   },
   appendAt: function (el, tagName, props, attrs) {
-    var TagClass = this.getRegisteredTag(tagName)
+    var TagClass
+    if (isFunction(tagName)) {
+      TagClass = tagName
+      tagName = TagClass.tagName
+    } else {
+      TagClass = this.getRegisteredTag(tagName)
+    }
     if (!TagClass) throw new Error(tagName + ' not registered')
     var newEl = document.createElement(tagName)
     el.appendChild(newEl)
@@ -60,3 +73,11 @@ module.exports = {
     return TagClass
   }
 }
+
+if (window.ovalInstance && window.globalOval) {
+  ovalInstance = window.ovalInstance
+} else {
+  ovalInstance.init()
+  window.ovalInstance = ovalInstance
+}
+module.exports = ovalInstance
