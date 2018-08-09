@@ -60,6 +60,12 @@ module.exports = {
 
 ## API
 
+### window.globalOval
+
+In case there are more than one `js` bundles, all using `organic-oval` we can set `window.globalOval` to `true`, which will make oval use the same instance in each `js` bundle.
+
+This is helpful when we dynamically require components, but want all of them registered in the same oval instance.
+
 ### oval.init(plasma)
 
 initializes `organic-oval` with *optional* plasma instance
@@ -112,12 +118,26 @@ append, mount and update a new tag instance to given `el` by `tagName`. This met
 oval.appendAt(window.document.body, 'my-tag')
 ```
 
+`tagName` can also be a tag instance
+
+```js
+var CustomTag = require('custom-tag')
+oval.appendAt(window.document.body, CustomTag)
+```
+
 ### oval.mountAt(el, tagName, props, attrs)
 
 mount and update a new tag instance to given `el` by `tagName`. This method overrides given element with the tag instance
 
 ```js
 oval.mountAt(window.document.body, 'my-app-tag')
+```
+
+`tagName` can also be a tag instance
+
+```js
+var CustomTag = require('custom-tag')
+oval.appendAt(window.document.body, CustomTag)
 ```
 
 ### oval.BaseTag(tag, tagName, rootEl, props)
@@ -197,6 +217,64 @@ here is how the whole `navigation.tag` looks like
     <li><a href={tag.links.about}>About</a></li>
   </ul>
 </navigation>
+```
+
+### Usage of Tags
+
+There are two ways to use a tag:
+
+#### Global oval tags
+
+The first way is to have the custom tag registered to `Oval`. This is the default behaviour for all tags. For example if have a `CustomTag`:
+
+```html
+<custom-tag>
+  <script>
+    // logic here
+  </script>
+  <div>
+    {tag.props.message}
+  </div>
+</custom-tag>
+```
+
+when the tag is required, it is automatically registered using `oval.registerTag('custom-tag', customTag)`
+
+The usage later is with the tag's name (`custom-tag`)
+
+```html
+<parent-tag>
+  <script>
+    require('custom-tag')
+  </script>
+  <custom-tag prop-message={'Hello Oval!'} />
+</parent-tag>
+```
+
+### Local tags
+
+In case there is a need to have the tag not registered to oval, `local-tag` marks the tag as local, which will tell the compiler to skip the global tag registering.
+
+```html
+<custom-tag local-tag>
+  <script>
+    // logic here
+  </script>
+  <div>
+    {tag.props.message}
+  </div>
+</custom-tag>
+```
+
+Then the usage of this tag is as follows:
+
+```html
+<parent-tag>
+  <script>
+    var CustomTag = require('custom-tag')
+  </script>
+  <CustomTag prop-message={'Hello Oval!'} />
+</parent-tag>
 ```
 
 ### Nested Tags
