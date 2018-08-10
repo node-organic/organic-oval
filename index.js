@@ -18,10 +18,23 @@ const buildCreateElement = function (component) {
         custom_el_props.key = props.key
         custom_el_props.slot = props.slot
         for (let key in props) {
+          if (key.indexOf('prop-') === 0) {
+            continue // pass implicitly as component prop
+          }
           let isPropFunction = typeof props[key] === 'function'
           let isDOMEvent = key.indexOf('on') === 0
           if (isPropFunction && isDOMEvent) {
             custom_el_props[key] = props[key]
+            delete props[key]
+          }
+          if (typeof props[key] === 'string') {
+            custom_el_props[key] = props[key]
+            delete props[key]
+          }
+        }
+        for (let key in props) {
+          if (key.indexOf('prop-') === 0) {
+            props[key.replace('prop-', '')] = props[key]
             delete props[key]
           }
         }
