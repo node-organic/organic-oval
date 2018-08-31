@@ -27,6 +27,16 @@ describe('oval', function () {
     expect(oval.registeredTags.length).to.eq(1)
   })
 
+  it('registerTag - no ovalRegisterMultiple', function () {
+    expect(() => oval.registerTag('custom-tag', Tag)).to.throw
+  })
+
+  it('registerTag - with ovalRegisterMultiple', function () {
+    window.ovalRegisterMultiple = true
+    expect(() => oval.registerTag('custom-tag', Tag)).not.to.throw
+    window.ovalRegisterMultiple = false
+  })
+
   it('getRegisteredTag', function () {
     var Tag = oval.getRegisteredTag('custom-tag')
     expect(Tag).to.eq(Tag)
