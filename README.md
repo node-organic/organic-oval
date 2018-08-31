@@ -66,6 +66,10 @@ In case there are more than one `js` bundles, all using `organic-oval` we can se
 
 This is helpful when we dynamically require components, but want all of them registered in the same oval instance.
 
+### window.ovalRegisterMultiple
+
+In case we load component from more than one `js` bundles and different bundles contain the same tag, we can set `window.ovalRegisterMultiple` to `true`, which will ignore the second and later requests for registering a tag with a name, that has already been registered.
+
 ### oval.init(plasma)
 
 initializes `organic-oval` with *optional* plasma instance
