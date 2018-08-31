@@ -65,7 +65,10 @@ var ovalInstance = {
     return instance
   },
   registerTag: function (tagName, TagClass) {
-    if (this.getRegisteredTag(tagName)) throw new Error(tagName + ' already registered')
+    if (this.getRegisteredTag(tagName))  {
+      if (!window.ovalRegisterMultiple) throw new Error(tagName + ' already registered')
+      else return this.getRegisteredTag(tagName)
+    }
     this.registeredTags.push({
       tagName: tagName.toLowerCase(),
       Tag: TagClass
