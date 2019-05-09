@@ -1,27 +1,39 @@
-const extractScript = function (lines) {
-  var buffer = []
-  var scriptFound = false
-  for (var i = 0; i < lines.length; i++) {
-    if (lines[i].indexOf('<script>') !== -1) {
-      scriptFound = true
+const supportedScripts = ['onconstruct', 'onmount', 'onrender']
+const matchScript = function (line) {
+  for (let i = 0; i < supportedScripts.length; i++) {
+    if (line.indexOf('<script ' + supportedScripts[i] + '>') !== -1) {
+      return supportedScripts[i]
+    }
+  }
+}
+const extractScripts = function (lines) {
+  let buffer = []
+  let scriptType = null
+  let results = {}
+  for (let i = 0; i < lines.length; i++) {
+    let matched = matchScript(lines[i])
+    if (matched) {
+      scriptType = matched
       lines.splice(i, 1)
       i -= 1
       continue
     }
-    if (lines[i].indexOf('</script>') !== -1) {
-      scriptFound = false
+    if (scriptType && lines[i].indexOf('</script>') !== -1) {
+      results[scriptType] = buffer.join('\n')
+      buffer = []
+      scriptType = null
       lines.splice(i, 1)
       i -= 1
       continue
     }
-    if (scriptFound) {
+    if (scriptType) {
       buffer.push(lines[i])
       lines.splice(i, 1)
       i -= 1
       continue
     }
   }
-  return buffer.join('\n')
+  return results
 }
 
 const extractTagInfo = function (lines) {
@@ -178,28 +190,31 @@ const parseIfs = function (lines) {
 }
 
 module.exports.compile = function (content) {
-  var lines = content.trim().split('\n')
-  var scriptContent = extractScript(lines)
-  var tagInfo = extractTagInfo(lines)
+  let lines = content.trim().split('\n')
+  let {
+    onconstruct = '',
+    onmount = '',
+    onrender = ''
+  } = extractScripts(lines)
+  let tagInfo = extractTagInfo(lines)
   parseIfs(lines)
   parseLoops(lines)
-  var htmlContent = lines.join('\n')
-  if (tagInfo.tagLine.indexOf('no-shadow-root') === -1) {
-    htmlContent = '<shadow-root>' + htmlContent.trim() + '</shadow-root>'
-  } else {
-    htmlContent = htmlContent.trim()
-  }
-  var result = `
+  let htmlContent = '<>' + lines.join('\n').trim() + '</>'
+  let result = `
   /** @jsx createElement */
+  /** @jsxFrag Fragment */
 
   module.exports = require('organic-oval').define({
     tagName: "${tagInfo.tagName}",
-    script: function () {
-      let tag = this
-      ${scriptContent.trim()}
-      this.template = function (createElement) {
-        return ${htmlContent}
-      }
+    template: function (createElement, Fragment, props, state) {
+      ${onrender.trim()}
+      return ${htmlContent}
+    },
+    onconstruct: function () {
+      ${onconstruct.trim()}
+    },
+    onmount: function () {
+      ${onmount.trim()}
     }
   })
 `
