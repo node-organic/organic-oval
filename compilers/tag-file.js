@@ -1,39 +1,27 @@
-const supportedScripts = ['onconstruct', 'onmount', 'onrender']
 const matchScript = function (line) {
-  for (let i = 0; i < supportedScripts.length; i++) {
-    if (line.indexOf('<script ' + supportedScripts[i] + '>') !== -1) {
-      return supportedScripts[i]
-    }
-  }
+  return line.indexOf('<script>') !== -1
 }
-const extractScripts = function (lines) {
+const extractScriptContent = function (lines) {
   let buffer = []
-  let scriptType = null
-  let results = {}
+  let inScriptBlock = false
   for (let i = 0; i < lines.length; i++) {
-    let matched = matchScript(lines[i])
-    if (matched) {
-      scriptType = matched
+    if (matchScript(lines[i])) {
+      inScriptBlock = true
       lines.splice(i, 1)
       i -= 1
       continue
     }
-    if (scriptType && lines[i].indexOf('</script>') !== -1) {
-      results[scriptType] = buffer.join('\n')
-      buffer = []
-      scriptType = null
+    if (inScriptBlock && lines[i].indexOf('</script>') !== -1) {
       lines.splice(i, 1)
-      i -= 1
-      continue
+      return buffer.join('\n')
     }
-    if (scriptType) {
+    if (inScriptBlock) {
       buffer.push(lines[i])
       lines.splice(i, 1)
       i -= 1
       continue
     }
   }
-  return results
 }
 
 const extractTagInfo = function (lines) {
@@ -191,11 +179,7 @@ const parseIfs = function (lines) {
 
 module.exports.compile = function (content) {
   let lines = content.trim().split('\n')
-  let {
-    onconstruct = '',
-    onmount = '',
-    onrender = ''
-  } = extractScripts(lines)
+  let scriptContent = extractScriptContent(lines) || ''
   let tagInfo = extractTagInfo(lines)
   parseIfs(lines)
   parseLoops(lines)
@@ -206,15 +190,13 @@ module.exports.compile = function (content) {
 
   module.exports = require('organic-oval').define({
     tagName: "${tagInfo.tagName}",
-    template: function (createElement, Fragment, props, state) {
-      ${onrender.trim()}
-      return ${htmlContent}
-    },
+    tagLine: "${tagInfo.tagLine}",
     onconstruct: function () {
-      ${onconstruct.trim()}
-    },
-    onmount: function () {
-      ${onmount.trim()}
+      ${scriptContent.trim()}
+      this.template = function (Fragment, props, state) {
+        let createElement = this.createElement
+        return ${htmlContent}
+      }
     }
   })
 `
