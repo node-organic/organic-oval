@@ -1,5 +1,5 @@
 const matchScript = function (line) {
-  return line.indexOf('<script>') !== -1
+  return line.indexOf('<script ') !== -1
 }
 const extractScriptContent = function (lines) {
   let buffer = []
