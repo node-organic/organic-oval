@@ -5,8 +5,7 @@ let OID = 0
 const buildCreateElement = function (component) {
   return (input, props, ...kids) => {
     if (input === Fragment) return h(Fragment, props, kids)
-    let isTagName = typeof input === 'string'
-    let isComponentClass = !isTagName
+    let isComponentClass = typeof input !== 'string'
     let tagName = isComponentClass ? input.tagName : input
     tagName = tagName.toUpperCase()
     if (tagName === 'SLOT' && component.props) {
@@ -54,7 +53,7 @@ const buildCreateElement = function (component) {
 module.exports.upgrade = function (el) {
   if (!components[el.tagName]) throw new Error('oval component ' + el.tagName + ' not found')
   let ComponentClass = components[el.tagName]
-  el.preactComponent = render(h(ComponentClass), el, el.preactComponent)
+  el.preactRenderRef = render(h(ComponentClass), el, el.preactRenderRef)
   return el.component
 }
 
@@ -62,9 +61,9 @@ module.exports.define = function (options) {
   if (!options.tagName) throw new Error('options.tagName required')
   options.tagName = options.tagName.toUpperCase()
   if (components[options.tagName]) return components[options.tagName]
-  let skipGlobal = false
+  let isGlobal = true
   if (options.tagLine.indexOf('not-global') !== -1) {
-    skipGlobal = true
+    isGlobal = false
   }
   const OvalComponent = class extends Component {
     constructor () {
@@ -73,9 +72,12 @@ module.exports.define = function (options) {
       this.oid = OID++
       this.handlers = {}
       this.shouldRender = true
+      this.unmountCalled = false
       Object.defineProperty(this, 'el', {
         get: () => {
-          if (!this.base) throw new Error('Component base not found to provide `el` reference. Is the component mounted?')
+          if (!this.base) {
+            throw new Error('Component base not found to provide `el` reference. Is the component ' + options.tagName + ' mounted?')
+          }
           return this.base.parentNode
         }
       })
@@ -106,6 +108,11 @@ module.exports.define = function (options) {
       this.emit('updated')
     }
     componentDidMount () {
+      // @FIXME workaround in place for preact 10.beta1
+      // componentDidMount is called on instances who are
+      // not having base reference (possibly recycled)
+      if (!this.base) return
+
       this.el.component = this
       this.el.state = this.state
       this.el.on = this.on.bind(this)
@@ -127,11 +134,12 @@ module.exports.define = function (options) {
     }
     unmount () {
       let rootNode = this.el
-      render(null, rootNode, rootNode.preactComponent)
+      render(null, rootNode, rootNode.preactRenderRef)
       rootNode.parentNode.removeChild(rootNode)
     }
     componentWillUnmount () {
       this.emit('unmount')
+      this.unmountCalled = true
     }
     shouldComponentUpdate () {
       return this.shouldRender
@@ -142,10 +150,10 @@ module.exports.define = function (options) {
       }
       return this.template(Fragment, props, state)
     }
-    static appendAt (container) {
+    static appendAt (container, props) {
       let el = document.createElement(options.tagName)
       container.appendChild(el)
-      el.preactComponent = render(h(this), el, el.preactComponent)
+      el.preactRenderRef = render(h(this, props), el, el.preactRenderRef)
       return el
     }
     static get tagName () {
@@ -155,7 +163,7 @@ module.exports.define = function (options) {
       return options.tagProps || {}
     }
   }
-  if (!skipGlobal) {
+  if (isGlobal) {
     components[options.tagName] = OvalComponent
     let existingElements = document.body.querySelectorAll(options.tagName)
     existingElements.forEach(module.exports.upgrade)

@@ -1,5 +1,5 @@
 const matchScript = function (line) {
-  return line.indexOf('<script ') !== -1
+  return line.indexOf('<script') !== -1
 }
 const extractScriptContent = function (lines) {
   let buffer = []
@@ -177,6 +177,10 @@ const parseIfs = function (lines) {
   }
 }
 
+const escapeTagline = function (value) {
+  return value.replace(/"/g, '\\"')
+}
+
 module.exports.compile = function (content) {
   let lines = content.trim().split('\n')
   let scriptContent = extractScriptContent(lines) || ''
@@ -190,9 +194,11 @@ module.exports.compile = function (content) {
 
   module.exports = require('organic-oval').define({
     tagName: "${tagInfo.tagName}",
-    tagLine: "${tagInfo.tagLine}",
+    tagLine: "${escapeTagline(tagInfo.tagLine)}",
     onconstruct: function () {
+
       ${scriptContent.trim()}
+
       this.template = function (Fragment, props, state) {
         let createElement = this.createElement
         return ${htmlContent}
