@@ -4,13 +4,13 @@ organic front-end components as custom HTML tags
 
 **Check out** 
 
-* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
+* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks/tree/oval-v5.0.0)
 
 ### quick start
 
 #### install dependencies
 
-`npm i organic-oval webpack babel-loader babel-plugin-transform-react-jsx`
+`npm i organic-oval webpack babel-loader @babel/core @babel/plugin-transform-react-jsx`
 
 #### add webpack.config.js
 
@@ -25,19 +25,17 @@ module.exports = {
     'rules': [
       {
         test: /\.tag$/,
-        exclude: /(node_modules|bower_components)/,
         use: {
           loader: 'babel-loader',
           options: {
-            plugins: ['babel-plugin-transform-react-jsx']
+            plugins: [ require.resolve('@babel/plugin-transform-react-jsx') ]
           }
         }
       },
       {
         test: /\.tag$/,
-        exclude: /node_modules/,
         use: [
-          {loader: 'organic-oval/webpack/oval-loader'}
+          {loader: require.resolve('organic-oval/webpack/oval-loader')}
         ]
       }
     ]
@@ -86,7 +84,7 @@ require('./components/my-app.tag')
 </navigation>
 ```
 
-* The tag name **must be unique**.
+* The tag name **must be unique** for global components. See also Nesting local components section bellow.
 * The script is *optional* and contains the **component's constructor logic**.
 
 ### Nesting
@@ -100,6 +98,26 @@ require('./components/my-app.tag')
   </script>
   ...
   <navigation-item ...>...</navigation-item>
+  ...
+</navigation>
+```
+
+#### local components
+
+```html
+<!-- ./navigation-item.tag -->
+<navigation-item not-global>
+  ...
+</navigation-item>
+
+<!-- ./navigation.tag -->
+<navigation>
+  <script>
+    const MyItem = require('./navigation-item')
+    ...
+  </script>
+  ...
+  <MyItem ...>...</MyItem>
   ...
 </navigation>
 ```
@@ -134,7 +152,7 @@ require('./components/my-app.tag')
     console.log(this.props.obj) // {with_references: true}
     this.emit('eventName', 'response') // triggers eventName handlers
     this.on('mounted', () => {
-      this.shadowRoot.parentNode.triggerEvent(new Event('click')) // triggers click
+      this.el.triggerEvent(new Event('click')) // triggers click
     })
   </script>
   <div></div>
@@ -146,19 +164,21 @@ require('./components/my-app.tag')
 ```html
 <!-- ./my-container.tag -->
 <my-container>
-  <h1> Container with dynamic children: </h1>
-  <hr />
-  <slot name='inner' />
-  <hr />
+  <slot name='header' />
+  <slot name='content' />
+  <slot name='footer'>
+    <div>default footer</div>
+  </slot>
 </my-container>
 
 <!-- ./app.tag -->
 <app>
   <my-container>
-    <h2 slot='inner'>inner content 1</h2>
+    <h2 slot='content'>inner content 1</h2>
   </my-container>
   <my-container>
-    <my-custom-tag slot='inner'>inner content 2</my-custom-tag>
+    <loggedin-header slot='header' />
+    <main slot='content' />
   </my-container>
 </app>
 ```
@@ -205,56 +225,6 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
-### shadow-root
-
-Oval components always render `shadow-root` element into dom as first child of the component's element. That is to provide API as close to custom elements as possible.
-You can disable this behaviour on per component basis by instructing compilation without shadow-root element wrapping via `no-shadow-root` attribute.
-
-The following:
-
-```html
-<!-- custom-element.tag -->
-<custom-element>
-  <div>text</div>
-  <div>text2</div>
-</custom-element>
-```
-
-Results in:
-
-```html
-<custom-element>
-  <shadow-root>
-    <div>text</div>
-    <div>text2</div>
-  </shadow-root>
-</custom-element>
-```
-
-To access `shadow-root` dom node use `shadowRoot` getter on component level 
-after component has been mounted.
-
-Having the following with `no-shadow-root`:
-
-```html
-<!-- custom-element.tag -->
-<custom-element no-shadow-root>
-  <div>text</div>
-</custom-element>
-```
-
-Results in:
-
-```html
-<custom-element>
-  <div>text</div>
-</custom-element>
-```
-
-Here `shadowRoot` getter will return reference to rendered `div` dom node.
-
-:warning: without shadow-root element the component should render only one root element
-
 ### find oval component reference
 
 ```html
@@ -262,25 +232,12 @@ Here `shadowRoot` getter will return reference to rendered `div` dom node.
 <custom-element>
   <script>
     this.on('mounted', () => {
-      let el = this.shadowRoot.querySelector('another-custom-element')
+      let el = this.el.querySelector('another-custom-element')
       let component = el.component
       console.log(component) // reference to another-custom-element component
     })
   </script>
   <another-custom-element />
-</custom-element>
-```
-
-### find oval component root dom node reference
-
-```html
-<!-- custom-element.tag -->
-<custom-element>
-  <script>
-    this.on('mounted', () => {
-      console.log(this.shadowRoot.parentNode) // reference to dom node `<CUSTOM-ELEMENT />`
-    })
-  </script>
 </custom-element>
 ```
 
@@ -290,19 +247,18 @@ Here `shadowRoot` getter will return reference to rendered `div` dom node.
 The method defines a component accordingly to its options:
 
 * `tagName`: String
-* `script()`: Function
-* `template(createElement)`: Function, *optional*
+* `tagLine`: String
+* `onconstruct`: Function
 
-:warning: Note that the method also upgrades any document.body elements by `tagName`
+:warning: Note that the method also upgrades any document.body elements by `tagName`, to skip that action provide a `tagLine` with `not-global` attribute.
 
 ```js
 /** @jsx createElement */
 require('organic-oval').define({
   tagName: 'my-tag',
-  script: function () {
-    this.template = function (createElement) {
-      return <div>tag content</div>
-    }
+  onconstruct: function () {
+    // this equals to OvalComponent instance and is executed
+    // during component construction
   }
 })
 ```
@@ -320,11 +276,11 @@ document.body.appendChild(el)
 require('organic-oval').upgrade(el)
 ```
 
-### Oval Component API
+### OvalComponent
 Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
 
-#### shadowRoot
-Returns reference to the rendered `<shadow-root>` element or to the component's base element in case `no-shadow-root` attribute is set.
+#### el
+Returns reference to the rendered component's element.
 
 #### update
 Instructs to do a `forceUpdate` of the component. Fires `update` related events.
@@ -385,6 +341,15 @@ on the first line
     Some Text
   </h1>
   ```
+  
+  will work as expected:
+  
+  ```html
+  <h1 if=${condition}
+    class='test'>
+    Some Text
+  </h1>
+  ```
 
 2. each loops will work only when looped node is declared on the next line
 
@@ -393,3 +358,18 @@ on the first line
   ```html
   <each model in ${items}><looped-content>${model}</looped-content></each>
   ```
+  
+  will work as expected:
+  
+  ```html
+  <each model in ${items}>
+    <looped-content>${model}</looped-content>
+  </each>
+  ```
+  
+## Roadmap and Contributions
+
+* fix known compiler issues
+* implement more plugins for other source code bundlers
+
+Any help is welcome and PRs will be reviewed and possibly merged carefully only by good people ;) :heart:
