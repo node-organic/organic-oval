@@ -23,7 +23,7 @@ test('compiles both if and each separately', function () {
         <h1 key={this.oid + "-if0"}>
           html test
         </h1>
-      : null
+      : ""
     }
     {
       items.map((item) =>
@@ -60,7 +60,7 @@ test('compiles if with inner each', function () {
             )
           }
         </h1>
-      : null
+      : ""
     }`
   })
 })
@@ -93,7 +93,7 @@ test('compiles each with inner if', function () {
               <h1 key={this.oid+"-if0"}>
                 html test
               </h1>
-            : null
+            : ""
           }
         </div>
       )

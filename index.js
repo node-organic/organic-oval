@@ -108,11 +108,6 @@ module.exports.define = function (options) {
       this.emit('updated')
     }
     componentDidMount () {
-      // @FIXME workaround in place for preact 10.beta1
-      // componentDidMount is called on instances who are
-      // not having base reference (possibly recycled)
-      if (!this.base) return
-
       this.el.component = this
       this.el.state = this.state
       this.el.on = this.on.bind(this)

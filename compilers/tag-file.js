@@ -156,7 +156,7 @@ const parseIfs = function (lines) {
           lines.splice(i + k + 1, 0, buffer[k])
         }
         // insert closing tag
-        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '> : null' + closeBr)
+        lines.splice(i + buffer.length + 1, 0, '</' + nodeName + '> : ""' + closeBr)
       } else {
         // single line if statement such as `<p if=${statement}>text</p>``
 
@@ -171,7 +171,7 @@ const parseIfs = function (lines) {
         lineWithoutStatement = parts.join(' ')
 
         // rewrite the line
-        lines[i] = openBr + statement + ' ? ' + lineWithoutStatement + ' : null' + closeBr
+        lines[i] = openBr + statement + ' ? ' + lineWithoutStatement + ' : "" ' + closeBr
       }
     }
   }
