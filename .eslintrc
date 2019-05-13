@@ -1,17 +1,19 @@
 {
   "extends": "standard",
+  "parserOptions": {
+    "ecmaVersion": 2017
+  },
   "rules": {
-    "comma-dangle": [0]
+    "comma-dangle": [0],
+    "camelcase": [0]
   },
   "globals": {
-    "describe": true,
-    "before": true,
-    "after": true,
-    "it": true,
     "test": true,
     "expect": true,
-    "xit": true,
-    "xdescribe": true,
-    "CustomEvent": true
+    "beforeEach": true,
+    "customElements": true,
+    "HTMLElement": true,
+    "CustomEvent": true,
+    "jest": true
   }
 }

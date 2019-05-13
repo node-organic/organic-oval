@@ -2,30 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## *[4.3.0]* - 2018-08-09
+## [5.0.0] - 2019-05-13
 
-### Added
+:warning: this release breaks towards 4.2.0 :warning:
 
-- `local-tag` - the ability to mark tag as local, which will make oval skip registering it globally
-- assign tag to a variable
-  - making possible the usage of tags as variables
-    ```html
-    <component>
-      <script>
-        var CustomTag = require('custom-tag.tag')
-        var customTagData = [1, 2, 3, 4]
-      </script>
-      <CustomTag prop-data={customTagData} />
-    </component>
-    ```
-- global oval in `window`
-  - if oval is used by more than one `js` file in a page, checking `window.globalOval` will tell oval to return the same oval instance in all files
-  - helps when different `js` bundles share registered oval tags
+### Breaking changes
 
-### Improved
-
-- added tests for tag data gathering
-- added tag-flags functionality in compiler
+* `compilers/tag-file` - delegates all js specific component definition to *the runtime*
+* `index.js` - represents an singleton commonjs module aka *the runtime* with default renderer `preact`
+* `directives` are removed
+* `BaseTag` api is removed
+* `tag.plasma` is removed and custom elements dispatch custom dom events on themselfs
 
 ## *[4.2.0]* - 2017-03-12
 

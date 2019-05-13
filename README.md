@@ -1,303 +1,96 @@
-# organic-oval
+# organic-oval v5
 
 organic front-end components as custom HTML tags
 
-**Check out [organic-oval-examples](https://github.com/camplight/organic-oval-examples) for example usages of `organic-oval`**
+**Check out** 
 
-## Setup
+* [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks/tree/oval-v5.0.0)
 
-Oval can be used in many ways. There are different setups for each way. Read them all and choose the one that best fits you. You can check out all example setups and test them out [**here**](https://github.com/camplight/organic-oval-examples/tree/master/setups)
-
-### quick setup
+### quick start
 
 #### install dependencies
 
-`npm i organic-oval webpack babel-loader babel-plugin-transform-react-jsx babel-preset-es2015`
+`npm i organic-oval webpack babel-loader @babel/core @babel/plugin-transform-react-jsx`
 
 #### add webpack.config.js
 
 ```js
-var webpack = require('webpack')
+const webpack = require('webpack')
 
 module.exports = {
   'resolve': {
-    'extensions': ['', '.webpack.js', '.web.js', '.tag', '.js'],
-    'modulesDirectories': ['web_modules', 'node_modules']
+    'extensions': ['.webpack.js', '.web.js', '.js', '.tag'],
   },
-  'plugins': [
-    new webpack.ProvidePlugin({
-      'oval': 'organic-oval'
-    })
-  ],
   'module': {
-    'preLoaders': [
+    'rules': [
       {
         test: /\.tag$/,
-        exclude: /node_modules/,
-        loaders: [
-          'organic-oval/webpack/oval-loader',
-          'organic-oval/webpack/oval-control-statements-loader'
-        ]
-      }
-    ],
-    'loaders': [
-      {
-        test: /\.js$|\.tag$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          plugins: [
-            ['transform-react-jsx', { pragma: 'createElement' }]
-          ],
-          presets: ['es2015']
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: [ require.resolve('@babel/plugin-transform-react-jsx') ]
+          }
         }
+      },
+      {
+        test: /\.tag$/,
+        use: [
+          {loader: require.resolve('organic-oval/webpack/oval-loader')}
+        ]
       }
     ]
   }
 }
-
 ```
 
-## API
-
-### window.globalOval
-
-In case there are more than one `js` bundles, all using `organic-oval` we can set `window.globalOval` to `true`, which will make oval use the same instance in each `js` bundle.
-
-This is helpful when we dynamically require components, but want all of them registered in the same oval instance.
-
-### oval.init(plasma)
-
-initializes `organic-oval` with *optional* plasma instance
-
-```js
-var oval = require('organic-oval')
-oval.init()
-...
-```
-
-### oval.registerTag(tagName, TagClass)
-
-register tag with given implementation
-
-```js
-var MyTagClass = function (rootEl, props, attrs) {
-  oval.BaseTag(this, rootEl, props, attrs)
-}
-
-oval.registerTag('my-tag', MyTagClass)
-```
-
-### oval.getRegisteredTag(name)
-
-gets the tag class from registered tags by name
-
-```js
-var MyTagClass = oval.getRegisteredTag('my-tag')
-```
-
-### oval.mountAll(root)
-
-mount and update any tags under `root`
-
-Returns all mounted tags as Array
-
-```js
-// mount all registered tags found on body
-oval.mountAll(window.document.body)
-
-// mount all tags matching registered having ovalTag attribute recursively at domElement
-oval.mountAll(domElement)
-```
-
-### oval.appendAt(el, tagName, props, attrs)
-
-append, mount and update a new tag instance to given `el` by `tagName`. This method appends the tag to the given element.
-
-```js
-oval.appendAt(window.document.body, 'my-tag')
-```
-
-`tagName` can also be a tag instance
-
-```js
-var CustomTag = require('custom-tag')
-oval.appendAt(window.document.body, CustomTag)
-```
-
-### oval.mountAt(el, tagName, props, attrs)
-
-mount and update a new tag instance to given `el` by `tagName`. This method overrides given element with the tag instance
-
-```js
-oval.mountAt(window.document.body, 'my-app-tag')
-```
-
-`tagName` can also be a tag instance
-
-```js
-var CustomTag = require('custom-tag')
-oval.appendAt(window.document.body, CustomTag)
-```
-
-### oval.BaseTag(tag, tagName, rootEl, props)
-
-Tag constructor Function
-
-```js
-class MyTag {
-  constructor (tagName, rootEl, props) {
-    oval.BaseTag(this, tagName, rootEl, props)
-  }
-}
-```
-
-## Oval Tags Usage
-
-### Basic Tag
-
-Every tag consists of 3 parts, which are all declared i the `.tag` file.
-
-#### **tag name**
-
-The **tag name** is used for the tag registration and usage later in the application. The tag name must be unique.
-
-For example if we have the site navigation moved in its own tag, we can name the tag `navigation`.
-
-The tag name is declared in the first opening and last closing tags in the `.tag` file
+### use
 
 ```html
-<navigation>
-  ...
-</navigation>
+<!-- ./index.html -->
+<html>
+  <body>
+    <my-app></my-app>
+    <script src='./bundle.js'></script>
+  </body>
+</html>
 ```
 
-#### **script (optional)**
-
-  The script contains the tag's logic. It must be wrapped in `<script>` tags. The tag object is accessed via the `tag` variable.
+```js
+// ./bundle.js
+require('./components/my-app.tag')
+```
 
 ```html
-...
-<script>
-  tag.links = {
-    home: '#home',
-    about: '#about'
-  }
-</script>
-...
+<!-- ./my-app.tag -->
+<my-app>
+  <h1>Welcome!</h1>
+</my-app>
 ```
 
-#### **template**
-
-The template part contains all the DOM elements. It describes the layout of the tag. Organic-oval uses [JSX]() to describe its layout. You have the `tag` variable available in the template, too.
-
-```html
-...
-<ul class="navigation">
-  <li><a href={tag.links.home}>Home</a></li>
-  <li><a href={tag.links.about}>About</a></li>
-</ul>
-...
-```
-
-#### Basic Tag Example
-
-here is how the whole `navigation.tag` looks like
+## DSL
 
 ```html
 <navigation>
   <script>
-    tag.links = {
+    this.state.links = {
       home: '#home',
       about: '#about'
     }
   </script>
   <ul class="navigation">
-    <li><a href={tag.links.home}>Home</a></li>
-    <li><a href={tag.links.about}>About</a></li>
+    <li><a href={this.state.links.home}>Home</a></li>
+    <li><a href={this.state.links.about}>About</a></li>
   </ul>
 </navigation>
 ```
 
-### Usage of Tags
+* The tag name **must be unique** for global components. See also Nesting local components section bellow.
+* The script is *optional* and contains the **component's constructor logic**.
 
-There are two ways to use a tag:
-
-#### Global oval tags
-
-The first way is to have the custom tag registered to `Oval`. This is the default behaviour for all tags. For example if have a `CustomTag`:
+### Nesting
 
 ```html
-<custom-tag>
-  <script>
-    // logic here
-  </script>
-  <div>
-    {tag.props.message}
-  </div>
-</custom-tag>
-```
-
-when the tag is required, it is automatically registered using `oval.registerTag('custom-tag', customTag)`
-
-The usage later is with the tag's name (`custom-tag`)
-
-```html
-<parent-tag>
-  <script>
-    require('custom-tag')
-  </script>
-  <custom-tag prop-message={'Hello Oval!'} />
-</parent-tag>
-```
-
-### Local tags
-
-In case there is a need to have the tag not registered to oval, `local-tag` marks the tag as local, which will tell the compiler to skip the global tag registering.
-
-```html
-<custom-tag local-tag>
-  <script>
-    // logic here
-  </script>
-  <div>
-    {tag.props.message}
-  </div>
-</custom-tag>
-```
-
-Then the usage of this tag is as follows:
-
-```html
-<parent-tag>
-  <script>
-    var CustomTag = require('custom-tag')
-  </script>
-  <CustomTag prop-message={'Hello Oval!'} />
-</parent-tag>
-```
-
-### Nested Tags
-
-#### Requiring a nested tag
-
-In order to use a tag within a tag, you must require it in the `<script></script>`. There is no need to assign it to a variable. What the require does is to register the nested tag to `oval`.
-
-```html
-<navigation>
-  <script>
-    require('./navigation-item')
-    ...
-  </script>
-  ...
-</navigation>
-```
-
-#### Using a nested tag
-
-After requiring it, the nested tag can be used as any other tag in the parent's template.
-
-```html
+<!-- ./navigation.tag -->
 <navigation>
   <script>
     require('./navigation-item')
@@ -309,100 +102,109 @@ After requiring it, the nested tag can be used as any other tag in the parent's 
 </navigation>
 ```
 
-### Passing props to a tag
-
-#### As an attribute
-
-Setting an attribute to nested component is just like setting an attribute to a DOM element.
+#### local components
 
 ```html
+<!-- ./navigation-item.tag -->
+<navigation-item not-global>
+  ...
+</navigation-item>
+
+<!-- ./navigation.tag -->
 <navigation>
   <script>
-    require('./navigation-item')
+    const MyItem = require('./navigation-item')
     ...
   </script>
   ...
-  <navigation-item class="item" data-value='42' ...>...</navigation-item>
+  <MyItem ...>...</MyItem>
   ...
 </navigation>
-
-<navigation-item>
-  <script>
-    console.log(tag.attributes.class) // item
-  </script>
-  <div {...tag.attributes}></div>
-</navigation-item>
 ```
 
-#### By reference as property
-
-Passing a property by reference makes it available as `tag.props.link` in the nested tag's logic.
+### Props, attributes and handlers
 
 ```html
+<!-- ./navigation.tag -->
 <navigation>
   <script>
     require('./navigation-item')
-    tag.myVariable = {title: 'Home', href: '#home'}
-    ...
+    this.itemValue = 'item'
+    this.obj = {with_references: true}
+    this.handler = (value) => {
+      console.log(value) // 'response'
+    }
+    this.clickHandler = (e) => {}
   </script>
   ...
-  <navigation-item prop-link={tag.myVariable}...>
-    ...
-  </navigation-item>
+  <navigation-item 
+    d-value={this.itemValue} 
+    obj={this.obj} 
+    eventName={this.handler}
+    onclick={this.clickHandler} />
   ...
 </navigation>
 
+<!-- ./navigation-item.tag -->
 <navigation-item>
   <script>
-    console.log(tag.props.link) // {title: 'Home', href: '#home'}
+    console.log(this.props['d-value']) // "item"
+    console.log(this.props.obj) // {with_references: true}
+    this.emit('eventName', 'response') // triggers eventName handlers
+    this.on('mounted', () => {
+      this.el.triggerEvent(new Event('click')) // triggers click
+    })
   </script>
+  <div></div>
 </navigation-item>
 ```
 
 ### Render inner content
 
 ```html
+<!-- ./my-container.tag -->
 <my-container>
-  <h1> Container with dynamic children: </h1>
-  <hr />
-  {tag.innerChildren}
-  <hr />
+  <slot name='header' />
+  <slot name='content' />
+  <slot name='footer'>
+    <div>default footer</div>
+  </slot>
 </my-container>
 
+<!-- ./app.tag -->
 <app>
   <my-container>
-    <h2>inner content 1</h2>
+    <h2 slot='content'>inner content 1</h2>
   </my-container>
   <my-container>
-    <my-custom-tag>inner content 2</my-custom-tag>
+    <loggedin-header slot='header' />
+    <main slot='content' />
   </my-container>
 </app>
 ```
 
-### Using oval control statements
-
-#### IF conditional statements
+### Conditional control statements
 
 ```html
 <navigation>
   <script>
-    tag.show = false
+    this.show = false
   </script>
-  <h1 if={tag.show}>
+  <h1 if={this.show}>
     H1 Text
   </h1>
 </navigation>
 ```
 
-#### Loop control statements
+### Loop control statements
 
 ```html
 <navigation>
   <script>
-    tag.items = [1, 2, 3]
+    this.items = [1, 2, 3]
   </script>
   <ul>
-    <each itemValue, itemIndex in {tag.items}>
+    <each itemValue, itemIndex in {this.items}>
       <li>{itemIndex} - {itemValue}</li>
     </each>
   </ul>
@@ -411,7 +213,7 @@ Passing a property by reference makes it available as `tag.props.link` in the ne
 
 ### control re-rendering of tags
 
-The following tag won't re-render itself and will not be replaced by parent tag updates as long as it is instantiated and part of the dom. This is particulary useful for optimizations, see [organic-oval-benchmarks](https://github.com/camplight/organic-oval-benchmarks)
+The following tag won't re-render itself and will not be replaced by parent tag updates as long as it is instantiated and part of the dom.
 
 ```html
 <my-tag>
@@ -423,153 +225,151 @@ The following tag won't re-render itself and will not be replaced by parent tag 
 </my-tag>
 ```
 
-### Tag directives
-
-`organic-oval` gives you the functionality to extend the `createElement` function. You can write your directive and inject it in the components that will use it.
-
-A directive is the following module:
-
-```js
-module.exports = function (tag, directiveName) {
-  return {
-    preCreate: function (createElement, tagName, props, ...children) {
-      // ... augment props
-      var directiveValue = props[directiveName]
-      // optionally return new array of children instead of given ones using createElement Fn
-      // example: return [createElement('div'), createElement('my-component')]
-    },
-    postCreate: function (el, directiveValue) {
-      // ... augment `el` dom element
-    },
-    tagName: function (tagName, props) {
-      // return different tagName value
-      var newTagNameValue = props[directiveName]
-      return newTagNameValue
-    }
-  }
-}
-```
-
-And can be injected into any tag:
+### find oval component reference
 
 ```html
-<my-tag>
+<!-- custom-element.tag -->
+<custom-element>
   <script>
-    tag.injectDirectives({
-      'directive-name': require('my-directive')
+    this.on('mounted', () => {
+      let el = this.el.querySelector('another-custom-element')
+      let component = el.component
+      console.log(component) // reference to another-custom-element component
     })
   </script>
-  ...
-  <p directive-name>hello directives</p>
-  ...
-</my-tag>
+  <another-custom-element />
+</custom-element>
 ```
 
-Check out the [**directive example**](https://github.com/camplight/organic-oval-examples/tree/master/tags/directives) to see more.
+## API
 
-### References to Dom Elements
+### oval.define(options)
+The method defines a component accordingly to its options:
 
-```html
-<my-tag>
-  <script>
-    tag.on('updated', () => {
-      console.log(tag.refs.inputName)
-    })
-  </script>
-  <input ref='inputName' />
-</my-tag>
-```
+* `tagName`: String
+* `tagLine`: String
+* `onconstruct`: Function
 
-## global augmenting
+:warning: Note that the method also upgrades any document.body elements by `tagName`, to skip that action provide a `tagLine` with `not-global` attribute.
 
 ```js
-// global-oval.js
-module.exports = function (oval) {
-  var oldBaseTag = oval.BaseTag
-  var myGlobalDirectives = [...]
-  oval.BaseTag = function (tag, rootEl, props, attrs) {
-    oldBaseTag(tag, rootEl, props, attrs)
-    tag.injectDirectives(myGlobalDirectives)
+/** @jsx createElement */
+require('organic-oval').define({
+  tagName: 'my-tag',
+  onconstruct: function () {
+    // this equals to OvalComponent instance and is executed
+    // during component construction
   }
-}
-
-// main.js
-var oval = require('organic-oval')
-require('global-oval')(oval)
+})
 ```
 
-### Lifecycle events
+### oval.upgrade(el)
+
+The method upgrades given NodeElement `el` accordingly to previously defined 
+component with matching `el.tagName`.
+
+Returns reference to the newly created component. Calling the method also sets `el.component` reference to the created component.
+
+```js
+let el = document.createElement('my-tag')
+document.body.appendChild(el)
+require('organic-oval').upgrade(el)
+```
+
+### OvalComponent
+Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
+
+#### el
+Returns reference to the rendered component's element.
+
+#### update
+Instructs to do a `forceUpdate` of the component. Fires `update` related events.
+
+#### unmount
+Removes the component and its custom element from dom. Fires `unmount` events.
+
+#### on(eventName, eventHandler)
+Start receiving emitted events. By default Oval Components self emit their Lifecycle events as follows:
+
+##### Events
 
 1. `mount` - only once on mount
 1. `update` - every time when tag is updated (respectively on first mount too)
-  * use this event to modify `tag.view` which will be used to patch `tag.root`
-1. `updated` - every time after tag is updated
-  * use this event to modify `tag.root`
-1. `mounted` - only once tag is mounted and updated
-1. `unmount` - when tag is going to be removed
-  * use this event to destroy any runtime allocated resources
-1. `unmounted` - when tag is removed
+1. `updated` - every time after tag is updated and rendered to dom
+1. `mounted` - only once tag is mounted and updated into dom
+1. `unmounted` - when tag is removed from dom
 
-### freeze dom elements
+Additionally any functions been passed to oval components will automatically subscribe:
 
 ```
-<my-tag>
-  <div freeze>won't be re-rendered allowing 3rd party libraries to manipulate the element</div>
-</my-tag>
+<my-container>
+  <script>
+    this.myCustomEventHandler = function (eventData) {
+      // triggered every second by `my-component`
+    }
+  </script>
+  <my-component customEvent={this.myCustomEventHandler} />
+</my-container>
+
+<my-component>
+  <script>
+    this.on('mounted', () => {
+      setInterval(() => {
+        this.emit('customEvent', 'customEventData')
+      }, 1000)
+    })
+  </script>
+</my-component>
 ```
 
-## Known Issues
+#### off(eventName, eventHandler)
+Stop receiving events
 
-1. multiline element declaration with `if` attribute will work only when if statement is on the first line
+#### emit(eventName, eventData)
+Publish `eventName` with optional `eventData` to all subscribers.
 
-  **Won't** work:
+## Known Compiler Issues
+
+1. element declaration with `if` attribute will work only when if statement is 
+on the first line
+
+  *will NOT* work:
 
   ```html
   <h1 class='test'
-    if={condition}>
+    if=${condition}>
     Some Text
   </h1>
   ```
-
-  *Will* work:
-
+  
+  will work as expected:
+  
   ```html
-  <h1 if={condition}
+  <h1 if=${condition}
     class='test'>
     Some Text
   </h1>
   ```
 
-2. each loops should have `cid` on every looped item so that incremental-dom can properly update them on changes
+2. each loops will work only when looped node is declared on the next line
 
-  **Won't** work with dynamic `items`:
-
+  *will NOT* work:
+  
   ```html
-  <each item in {items}>
-    <div>{item}</div>
+  <each model in ${items}><looped-content>${model}</looped-content></each>
+  ```
+  
+  will work as expected:
+  
+  ```html
+  <each model in ${items}>
+    <looped-content>${model}</looped-content>
   </each>
   ```
+  
+## Roadmap and Contributions
 
-  *Will* work:
+* fix known compiler issues
+* implement more plugins for other source code bundlers
 
-  ```html
-  <each item, index in {items}>
-    <div cid={index}>{item}</div>
-  </each>
-  ```
-
-3. conditional rendered sibling tags with same name should have `cid` so that incremental-dom can properly update them on changes
-
-  **Won't** work with conditional tags:
-
-  ```html
-  <div if={condition1}>...</div>
-  <div if={condition2}>...</div>
-  ```
-
-  *Will* work:
-
-  ```html
-  <div if={condition1} cid='value1'>...</div>
-  <div if={condition2} cid='value2'>...</div>
-  ```
+Any help is welcome and PRs will be reviewed and possibly merged carefully only by good people ;) :heart:

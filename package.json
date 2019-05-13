@@ -1,41 +1,34 @@
 {
   "name": "organic-oval",
-  "version": "4.3.0",
+  "version": "5.0.0",
   "description": "organic frontend components as custom html tags",
   "main": "index.js",
   "scripts": {
-    "test": "npm run test-style && mocha --compilers js:babel-register --require ./tests/setup.js tests/**/*.test.js",
-    "test-cov": "babel-node ./node_modules/istanbul/lib/cli cover node_modules/mocha/bin/_mocha -- --require ./tests/setup.js --recursive 'tests/**/*.test.js'",
-    "test-style": "eslint ./",
-    "release-patch": "git checkout develop && git pull origin develop && npm run test && npm version patch && git push origin develop && git checkout master && git pull origin master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop",
-    "release-minor": "git checkout develop && git pull origin develop && npm run test && npm version minor && git push origin develop && git checkout master && git pull origin master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop",
-    "release-major": "git checkout develop && git pull origin develop && npm run test && npm version major && git push origin develop && git checkout master && git pull origin master && git pull origin develop && npm publish && git push --tags && git push origin master && git checkout develop"
+    "test": "jest",
+    "release-patch": "npm run test && npm version patch && npm publish && git push --tags && git push origin master",
+    "release-minor": "npm run test && npm version minor && npm publish && git push --tags && git push origin master",
+    "release-major": "npm run test && npm version major && npm publish && git push --tags && git push origin master"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/camplight/organic-oval.git"
+    "url": "git+https://github.com/node-organic/organic-oval.git"
   },
   "author": "Camplight",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/camplight/organic-oval/issues"
+    "url": "https://github.com/node-organic/organic-oval/issues"
   },
-  "homepage": "https://github.com/camplight/organic-oval#readme",
-  "dependencies": {
-    "incremental-dom": "^0.4.1"
-  },
+  "homepage": "https://github.com/node-organic/organic-oval#readme",
   "devDependencies": {
-    "babel-cli": "^6.11.4",
-    "babel-polyfill": "^6.9.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-register": "^6.11.6",
-    "chai": "^3.5.0",
-    "eslint": "^3.1.1",
-    "eslint-config-standard": "^5.3.5",
-    "eslint-plugin-promise": "^3.8.0",
-    "eslint-plugin-standard": "^2.0.0",
-    "istanbul": "^0.4.4",
-    "jsdom": "^11.12.0",
-    "mocha": "^5.2.0"
+    "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-node": "^9.0.1",
+    "eslint-plugin-promise": "^4.1.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "jest": "^24.8.0"
+  },
+  "dependencies": {
+    "preact": "10.0.0-beta.1"
   }
 }

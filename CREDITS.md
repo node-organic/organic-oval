@@ -1,4 +1,5 @@
 # CREDITS
 
-* rendering uses [`incremental-dom`](https://github.com/google/incremental-dom)
-* `lib/incremental-create-element.js` is based on [`incremental-dom-react-helper`](https://github.com/thejameskyle/incremental-dom-react-helper)
+* dom rendering - [`preact`](https://preactjs.com/)
+* jsx tag transform - [`babel`](https://babeljs.io/)
+* tag compilation - [`webpack`](https://webpack.js.org/)
