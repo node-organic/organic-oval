@@ -2,21 +2,21 @@ const oval = require('../index')
 
 oval.define({
   tagName: 'tag-should-render',
-  script: function () {
+  tagLine: '',
+  onconstruct: function () {
     this.renderValue = '1'
     this.on('updated', () => {
       this.shouldRender = false
     })
-  },
-  template: function (h) {
-    return h('div', {'class': this.renderValue})
+    this.template = () => this.createElement('div', {'class': this.renderValue})
   }
 })
 
 oval.define({
   tagName: 'tag-container',
-  template: function (h) {
-    return h('tag-should-render')
+  tagLine: '',
+  onconstruct: function () {
+    this.template = () => this.createElement('tag-should-render')
   }
 })
 

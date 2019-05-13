@@ -2,15 +2,17 @@ const oval = require('../index')
 
 oval.define({
   tagName: 'app',
-  template: function (h) {
-    return h('container', null, h('h1', {slot: 'slot1'}, 'text'))
+  tagLine: '',
+  onconstruct: function () {
+    this.template = () => this.createElement('container', null, this.createElement('h1', {slot: 'slot1'}, 'text'))
   }
 })
 
 oval.define({
   tagName: 'container',
-  template: function (h) {
-    return h('div', null, h('slot', {name: 'slot1'}, 'default text'))
+  tagLine: '',
+  onconstruct: function () {
+    this.template = () => this.createElement('div', null, this.createElement('slot', {name: 'slot1'}, 'default text'))
   }
 })
 
@@ -18,7 +20,7 @@ test('shouldRender', function () {
   var app = document.createElement('app')
   document.body.appendChild(app)
   oval.upgrade(app)
-  expect(app.shadowRoot.tagName).toEqual('CONTAINER')
-  expect(app.shadowRoot.children[0].tagName).toEqual('DIV')
-  expect(app.shadowRoot.children[0].children[0].tagName).toEqual('H1')
+  expect(app.children[0].tagName).toEqual('CONTAINER')
+  expect(app.children[0].children[0].tagName).toEqual('DIV')
+  expect(app.children[0].children[0].children[0].tagName).toEqual('H1')
 })

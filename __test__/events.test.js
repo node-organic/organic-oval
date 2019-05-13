@@ -2,31 +2,35 @@ const oval = require('../index')
 
 oval.define({
   tagName: 'app',
-  template: function (h) {
-    return h('emitter', {
-      customEvent: () => {
-        this.customEventCalled = true
-      }
-    })
+  tagLine: '',
+  onconstruct: function () {
+    this.template = () => {
+      return this.createElement('emitter', {
+        customEvent: () => {
+          this.customEventCalled = true
+        }
+      })
+    }
   }
 })
 
 oval.define({
   tagName: 'emitter',
-  script: function () {
+  tagLine: '',
+  onconstruct: function () {
     this.on('mounted', () => {
       this.emit('customEvent')
     })
-  },
-  template: function (h) {
-    return h('div', null, 'text')
+    this.template = () => {
+      return this.createElement('div', null, 'text')
+    }
   }
 })
 
-test('shouldRender', function () {
+test('events', function () {
   var app = document.createElement('app')
   document.body.appendChild(app)
   oval.upgrade(app)
-  expect(app.shadowRoot.tagName).toEqual('EMITTER')
+  expect(app.children[0].tagName).toEqual('EMITTER')
   expect(app.component.customEventCalled).toEqual(true)
 })
