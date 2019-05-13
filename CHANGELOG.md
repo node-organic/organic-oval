@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [5.0.0] - YYYY-MM-DD
+## [5.0.0] - 2019-05-13
 
 :warning: this release breaks towards 4.2.0 :warning:
 
