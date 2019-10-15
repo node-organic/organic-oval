@@ -279,6 +279,15 @@ require('organic-oval').upgrade(el)
 ### OvalComponent
 Every Oval component extending `preact` Component. All methods are inherited thereafter and you should refer to [`preact`'s api refernce as well](https://preactjs.com/guide/api-reference)
 
+#### static appendAt
+
+Appends component instance at respective root.
+
+```
+const MyComponent = require('./my-component.tag')
+MyComponent.appendAt(document.body, props)
+```
+
 #### el
 Returns reference to the rendered component's element.
 

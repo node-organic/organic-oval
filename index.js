@@ -57,11 +57,6 @@ module.exports.upgrade = function (el, props) {
   return el.component
 }
 
-module.exports.appendAt = function (el, ComponentClass, props) {
-  el.preactRenderRef = render(h(ComponentClass, props), el, el.preactRenderRef)
-  return el.component
-}
-
 module.exports.define = function (options) {
   if (!options.tagName) throw new Error('options.tagName required')
   options.tagName = options.tagName.toUpperCase()
