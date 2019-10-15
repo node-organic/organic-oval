@@ -50,10 +50,15 @@ const buildCreateElement = function (component) {
   }
 }
 
-module.exports.upgrade = function (el) {
+module.exports.upgrade = function (el, props) {
   if (!components[el.tagName]) throw new Error('oval component ' + el.tagName + ' not found')
   let ComponentClass = components[el.tagName]
-  el.preactRenderRef = render(h(ComponentClass), el, el.preactRenderRef)
+  el.preactRenderRef = render(h(ComponentClass, props), el, el.preactRenderRef)
+  return el.component
+}
+
+module.exports.appendAt = function (el, ComponentClass, props) {
+  el.preactRenderRef = render(h(ComponentClass, props), el, el.preactRenderRef)
   return el.component
 }
 
