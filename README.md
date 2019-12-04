@@ -328,6 +328,22 @@ Stop receiving events
 #### emit(eventName, eventData)
 Publish `eventName` with optional `eventData` to all subscribers.
 
+#### appendAt(rootEl, props)
+Append the Component to an existing DOM element and provide the relevant component's props
+```html
+<!-- ./my-component.tag -->
+<my-component> ... </my-component>
+```
+
+```html
+<!-- ./some-other-file.js -->
+const MyComponent = require('./my-component')
+let rootEl = ... // a jquery selector or document.querySelectorAll 
+let props = { myProp: value, class: 'css-class' }
+MyComponent.appendAt(rootEl, props)
+```
+
+
 ## Known Compiler Issues
 
 1. element declaration with `if` attribute will work only when if statement is 
