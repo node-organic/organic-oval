@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [5.1.0] - 2019-12-15
+
+### Added
+
+* `render-as` feature support
+
 ## [5.0.2] - 2019-05-13
 
 :warning: this release breaks towards 4.2.0 :warning:

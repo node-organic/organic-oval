@@ -1,4 +1,4 @@
-const {h, render, Component, Fragment} = require('preact')
+const { h, render, Component, Fragment } = require('preact')
 const components = {}
 let OID = 0
 
@@ -43,7 +43,8 @@ const buildCreateElement = function (component) {
           }
         }
       }
-      return h(tagName, custom_el_props, h(components[tagName] || input, props, kids))
+      let renderTagName = custom_el_props.as || tagName
+      return h(renderTagName, custom_el_props, h(components[tagName] || input, props, kids))
     } else {
       return h(tagName, props, kids)
     }

@@ -122,6 +122,31 @@ require('./components/my-app.tag')
 </navigation>
 ```
 
+#### render components with different tag name
+
+```html
+<!-- ./my-table-row.tag -->
+<my-table-row>
+  ...
+</my-table-row>
+
+<!-- ./my-table.tag -->
+<my-table>
+  <script>
+    const MyTableRow = require('./my-table-row')
+    ...
+  </script>
+  ...
+  <table>
+    <tbody>
+      <MyTableRow as='tr'>...</MyTableRow>
+    </tbody>
+  </table>
+  
+  ...
+</my-table>
+```
+
 ### Props, attributes and handlers
 
 ```html
