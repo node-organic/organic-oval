@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [6.0.0] - 2020-01-21
+
+:warning: this release breaks towards 5.x.x :warning:
+
+### Breaking changes
+
+To access updated DOM once component is mounted call `await component.update()` otherwise the update happens async, ie accessing the DOM right after component update yeilds unexpected results.
+
+### Changed
+
+* `preact` to "10.2.1"
+
 ## [5.1.0] - 2019-12-15
 
 ### Added

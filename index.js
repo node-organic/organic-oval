@@ -124,9 +124,9 @@ module.exports.define = function (options) {
       this.emit('updated')
       this.emit('mounted')
     }
-    update () {
+    async update () {
       if (!this.shouldRender) return
-      this.forceUpdate()
+      await this.forceUpdate()
     }
     unmount () {
       let rootNode = this.el
