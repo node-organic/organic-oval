@@ -14,6 +14,10 @@ To access updated DOM once component is mounted call `await component.update()` 
 
 * `preact` to "10.2.1"
 
+### Fixed
+
+* `Component.appendAt(container, props)` - applies any String `props` to the created element.
+
 ## [5.1.0] - 2019-12-15
 
 ### Added

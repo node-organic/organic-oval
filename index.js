@@ -148,6 +148,11 @@ module.exports.define = function (options) {
     }
     static appendAt (container, props) {
       let el = document.createElement(options.tagName)
+      for (let key in props) {
+        if (typeof props[key] === 'string') {
+          el.setAttribute(key, props[key])
+        }
+      }
       container.appendChild(el)
       el.preactRenderRef = render(h(this, props), el, el.preactRenderRef)
       return el
