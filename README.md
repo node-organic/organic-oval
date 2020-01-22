@@ -364,6 +364,7 @@ Publish `eventName` with optional `eventData` to all subscribers.
 
 #### appendAt(rootEl, props)
 Append the Component to an existing DOM element and provide the relevant component's props
+
 ```html
 <!-- ./my-component.tag -->
 <my-component> ... </my-component>
@@ -377,6 +378,10 @@ let props = { myProp: value, class: 'css-class' }
 MyComponent.appendAt(rootEl, props)
 ```
 
+## Known Implementation Issues
+
+1. `this.props` is undefined during component construction and is available after `mount` event.
+2. `this.emit` emits only to component's listeners without delegation to dom events
 
 ## Known Compiler Issues
 
@@ -422,4 +427,4 @@ on the first line
 * fix known compiler issues
 * implement more plugins for other source code bundlers
 
-Any help is welcome and PRs will be reviewed and possibly merged carefully only by good people ;) :heart:
+Any help and PRs are welcome :heart:
