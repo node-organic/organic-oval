@@ -20,7 +20,7 @@ oval.define({
   }
 })
 
-test('shouldRender', function () {
+test('shouldRender', async function () {
   var container = document.createElement('tag-container')
   document.body.appendChild(container)
   oval.upgrade(container)
@@ -31,12 +31,12 @@ test('shouldRender', function () {
   expect(target.attributes.class.value).toEqual(renderValue)
   el.component.renderValue = 'changed'
   el.component.shouldRender = true
-  el.component.update()
+  await el.component.update()
+  expect(target.attributes.class.value).toEqual('changed')
   expect(el.component.shouldRender).toEqual(false)
-  expect(target.attributes.class.value).toEqual('changed')
   el.component.renderValue = 'changed2'
-  el.component.update()
+  await el.component.update()
   expect(target.attributes.class.value).toEqual('changed')
-  el.component.forceUpdate()
+  await el.component.forceUpdate()
   expect(target.attributes.class.value).toEqual('changed2')
 })
