@@ -103,7 +103,6 @@ module.exports.define = function (options) {
       this.emit('update')
     }
     componentWillUpdate () {
-      this.emit('update')
     }
     componentDidUpdate () {
       this.emit('updated')
@@ -144,6 +143,7 @@ module.exports.define = function (options) {
       if (this.defaultProps) {
         props = Object.assign({}, this.defaultProps, props)
       }
+      this.emit('update')
       return this.template(Fragment, props, state)
     }
     static appendAt (container, props) {

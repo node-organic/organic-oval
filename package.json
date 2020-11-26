@@ -29,6 +29,6 @@
     "jest": "^24.8.0"
   },
   "dependencies": {
-    "preact": "10.2.1"
+    "preact": "10.5.7"
   }
 }
